@@ -4,6 +4,7 @@ from django.db import models
 
 from .validators import validate_me
 
+
 class User(AbstractUser):
     ADMIN = 'admin'
     MODERATOR = 'moderator'
@@ -19,7 +20,7 @@ class User(AbstractUser):
         max_length=150,
         unique=True,
         validators=[UnicodeUsernameValidator(), validate_me],
-        error_messages = {
+        error_messages={
             'unique': ('Логин должен быть уникальным!'),
         },
     )
@@ -65,7 +66,7 @@ class User(AbstractUser):
     class Meta:
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
-        ordering = ('username')
+        ordering = ('username',)
 
     def __str__(self):
         return self.username
