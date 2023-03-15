@@ -1,8 +1,5 @@
 from django.contrib.auth.models import AbstractUser
-from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.db import models
-
-from .validators import validate_me
 
 
 class User(AbstractUser):
@@ -19,10 +16,6 @@ class User(AbstractUser):
         help_text='Укажите логин',
         max_length=150,
         unique=True,
-        validators=[UnicodeUsernameValidator(), validate_me],
-        error_messages={
-            'unique': ('Логин должен быть уникальным!'),
-        },
     )
     first_name = models.CharField(
         verbose_name='Имя пользователя',
