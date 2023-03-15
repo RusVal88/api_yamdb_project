@@ -10,7 +10,10 @@ class Category(models.Model):
     slug = models.SlugField(
         max_length=50,
         verbose_name='Страница категории',
-        help_text='Введите адрес страницы категории, доступные символы: ^[-a-zA-Z0-9_]+$',
+        help_text=(
+            'Введите адрес страницы категории,'
+            'доступные символы: ^[-a-zA-Z0-9_]+$'
+        ),
         unique=True,
     )
 
@@ -27,7 +30,10 @@ class Genre(models.Model):
     slug = models.SlugField(
         max_length=50,
         verbose_name='Страница жанра',
-        help_text='Введите адрес страницы жанра, доступные символы: ^[-a-zA-Z0-9_]+$',
+        help_text=(
+            'Введите адрес страницы жанра,'
+            'доступные символы: ^[-a-zA-Z0-9_]+$'
+        ),
         unique=True,
     )
 
@@ -42,7 +48,6 @@ class Titles(models.Model):
         help_text='Введите название произведения',
     )
     year = models.IntegerField(
-        max_length=4,
         verbose_name='Год создания произведения',
         help_text='Укажите год создания произведения',
     )
@@ -58,6 +63,7 @@ class Titles(models.Model):
     category = models.ForeignKey(
         Category,
         verbose_name='Категория',
+        null=True,
         on_delete=models.SET_NULL,
     )
 
