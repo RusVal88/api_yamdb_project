@@ -83,7 +83,7 @@ class Review(models.Model):
         verbose_name='Заголовок',
         help_text='Введите заголовок обзора',
         max_length=256,
-        )
+    )
     text = models.TextField(
         verbose_name='Текст',
         help_text='Напишите обзор',
@@ -91,13 +91,13 @@ class Review(models.Model):
     pub_date = models.DateTimeField(
         'Дата публикации',
         auto_now_add=True,
-        )
+    )
     author = models.ForeignKey(
         User,
         verbose_name='Автор обзора',
         on_delete=models.CASCADE,
         related_name='review',
-        )
+    )
     estimation = models.IntegerField(
         verbose_name='Оценка',
         help_text='Выберите оценку от 1 до 10',
@@ -109,7 +109,7 @@ class Review(models.Model):
         on_delete=models.CASCADE,
         related_name='review',
     )
-    
+
     def __str__(self):
         return self.text[:300]
 
