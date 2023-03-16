@@ -1,6 +1,5 @@
 from django.db import models
 from django.db.models import Avg
-
 from users.models import User
 
 
@@ -74,11 +73,11 @@ class Titles(models.Model):
         return self.name
 
     def get_rating(self):
-        return self.review.aggregate(Avg('estimation'))['estimation__avg']
+        return self.review.aggregate(Avg('score'))['score__avg']
 
 
 class Review(models.Model):
-    estimation_value = [(value, str(value)) for value in range(1, 11)]
+    score_value = [(value, str(value)) for value in range(1, 11)]
     heading = models.CharField(
         verbose_name='Заголовок',
         help_text='Введите заголовок обзора',
@@ -98,10 +97,10 @@ class Review(models.Model):
         on_delete=models.CASCADE,
         related_name='review',
     )
-    estimation = models.IntegerField(
+    score = models.IntegerField(
         verbose_name='Оценка',
         help_text='Выберите оценку от 1 до 10',
-        choices=estimation_value,
+        choices=score_value,
     )
     titles = models.ForeignKey(
         Titles,

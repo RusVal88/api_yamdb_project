@@ -46,7 +46,7 @@ class Migration(migrations.Migration):
                 ('title', models.CharField(help_text='Введите заголовок обзора', max_length=256, verbose_name='Заголовок')),
                 ('text', models.TextField(help_text='Напишите обзор', verbose_name='Текст')),
                 ('pub_date', models.DateTimeField(auto_now_add=True, verbose_name='Дата публикации')),
-                ('estimation', models.IntegerField(choices=[(1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5'), (6, '6'), (7, '7'), (8, '8'), (9, '9'), (10, '10')], help_text='Выберите оценку от 1 до 10', verbose_name='Оценка')),
+                ('score', models.IntegerField(choices=[(1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5'), (6, '6'), (7, '7'), (8, '8'), (9, '9'), (10, '10')], help_text='Выберите оценку от 1 до 10', verbose_name='Оценка')),
                 ('author', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='review', to=settings.AUTH_USER_MODEL, verbose_name='Автор обзора')),
                 ('titles', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='review', to='review.titles', verbose_name='Произведение')),
             ],
