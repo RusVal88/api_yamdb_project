@@ -29,24 +29,22 @@ class SignupSerializer(serializers.ModelSerializer):
         required=True,
         validators=(
             UnicodeUsernameValidator(
-                queryset=User.objects.all(),
-                error_messages={
-                    'unique': ('Логин уже занят!'), },
-            ),
-            validate_username,
-        )
+                regex=r'^[a-zA-Z0-9_-]+$'), ),
+        error_messages={'unique': ('Логин уже занят!'), },
     )
     email = serializers.EmailField(
         required=True,
         validators=(
             UniqueValidator(
-                queryset=User.objects.all(),
-                error_messages={
-                    'unique': ('Данный email уже зарегестрирван!'),
-                }
-            ),
-        )
+                queryset=User.objects.all(),),),
+        error_messages={
+            'unique': ('Данный email уже зарегестрирван!'),
+        }
     )
+
+    class Meta:
+        model = User
+        fields = ('username', 'email',)
 
     class Meta:
         model = User
