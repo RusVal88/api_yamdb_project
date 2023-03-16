@@ -2,10 +2,11 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.validators import UnicodeUsernameValidator
 
 from rest_framework import serializers
+from rest_framework.relations import SlugRelatedField
 from rest_framework.validators import UniqueValidator
 
 from .validators import validate_username
-from review.models import Titles
+from review.models import Category, Genre, Titles, Review, Comment
 
 User = get_user_model()
 
@@ -52,10 +53,7 @@ class SignupSerializer(serializers.ModelSerializer):
         fields = ('username', 'email',)
 
 
-class ProfileSerializer(
-    SignupSerializer,
-    UserSerializer
-):
+class ProfileSerializer(SignupSerializer, UserSerializer):
     role = serializers.CharField(read_only=True)
 
 
@@ -70,8 +68,6 @@ class TokenSerializer(serializers.Serializer):
     )
 
 
-
-
 class TitlesSerializer(serializers.ModelSerializer):
     rating = serializers.SerializerMethodField()
 
@@ -81,3 +77,20 @@ class TitlesSerializer(serializers.ModelSerializer):
 
     def get_rating(self, obj):
         return obj.get_rating()
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    author = SlugRelatedField(slug_field='username', read_only=True)
+
+    class Meta:
+        model = Review
+        fields = '__all__'
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    author = SlugRelatedField(slug_field='username', read_only=True)
+
+    class Meta:
+        model = Comment
+        field = '__all__'
+        read_only_field = ('review')
