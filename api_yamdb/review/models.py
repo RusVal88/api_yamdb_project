@@ -79,7 +79,7 @@ class Titles(models.Model):
 
 class Review(models.Model):
     estimation_value = [(value, str(value)) for value in range(1, 11)]
-    title = models.CharField(
+    heading = models.CharField(
         verbose_name='Заголовок',
         help_text='Введите заголовок обзора',
         max_length=256,
