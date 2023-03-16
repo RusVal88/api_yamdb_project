@@ -69,6 +69,10 @@ class Titles(models.Model):
         null=True,
         on_delete=models.SET_NULL,
     )
+    rating = models.PositiveSmallIntegerField(
+        null=True,
+        verbose_name='Рейтинг',
+    )
 
     def __str__(self):
         return self.name
