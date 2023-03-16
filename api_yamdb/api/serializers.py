@@ -5,6 +5,7 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
 from .validators import validate_username
+from review.models import Titles
 
 User = get_user_model()
 
@@ -67,3 +68,16 @@ class TokenSerializer(serializers.Serializer):
         required=True,
         max_length=50,
     )
+
+
+
+
+class TitlesSerializer(serializers.ModelSerializer):
+    rating = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Titles
+        field = ('rating')
+
+    def get_rating(self, obj):
+        return obj.get_rating()
