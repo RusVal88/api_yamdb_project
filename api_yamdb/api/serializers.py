@@ -86,10 +86,17 @@ class TitlesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Titles
-        field = '__all__'
+        fields = '__all__'
 
     def get_rating(self, obj):
-        return obj.get_rating()
+        reviews = obj.review.all()
+        if reviews:
+            avg_scores = (
+                (sum(review.score for review in reviews))
+                /len(reviews)
+            )
+            return round(avg_scores,0)
+        return None
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -105,6 +112,17 @@ class ReviewSerializer(serializers.ModelSerializer):
                 fields=('author', 'titles')
             )
         ]
+
+    def validate(self, data):
+        if data.get('score') not in data.get('score_value'):
+            raise serializers.ValidationError(
+                'Переданное значение "score" недопустимо.'
+                'Укажите число от 1 до 10.'
+            )
+        if not data.get('score'):
+            raise serializers.ValidationError('Задайте значение "score".')
+        return data
+
 
 
 class CommentSerializer(serializers.ModelSerializer):

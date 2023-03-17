@@ -1,5 +1,4 @@
 from django.db import models
-from django.db.models import Avg
 
 from users.models import User
 
@@ -51,7 +50,7 @@ class Titles(models.Model):
         help_text='Введите название произведения',
     )
     year = models.IntegerField(
-        verbose_name='Год создания произведения',
+        verbose_name='Год создания',
         help_text='Укажите год создания произведения',
     )
     description = models.TextField(
@@ -62,23 +61,23 @@ class Titles(models.Model):
     genre = models.ManyToManyField(
         Genre,
         verbose_name='Жанр',
+        help_text='Выберите жанр',
     )
     category = models.ForeignKey(
         Category,
         verbose_name='Категория',
+        help_text='Выберите категорию',
         null=True,
         on_delete=models.SET_NULL,
     )
     rating = models.PositiveSmallIntegerField(
         null=True,
+        blank=True,
         verbose_name='Рейтинг',
     )
 
     def __str__(self):
         return self.name
-
-    def get_rating(self):
-        return self.review.aggregate(Avg('score'))['score__avg']
 
 
 class Review(models.Model):
