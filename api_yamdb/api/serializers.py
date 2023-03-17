@@ -2,10 +2,12 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.validators import UnicodeUsernameValidator
 
 from rest_framework import serializers
-from rest_framework.validators import UniqueValidator
+from rest_framework.relations import SlugRelatedField
+from rest_framework.validators import UniqueValidator, UniqueTogetherValidator
 
 from .validators import validate_username
-from review.models import Titles, Category, Genre
+from review.models import Category, Genre, Titles, Review, Comment
+
 
 User = get_user_model()
 
@@ -28,34 +30,29 @@ class SignupSerializer(serializers.ModelSerializer):
         required=True,
         validators=(
             UnicodeUsernameValidator(
-                queryset=User.objects.all(),
-                error_messages={
-                    'unique': ('Логин уже занят!'), },
-            ),
-            validate_username,
-        )
+                regex=r'^[a-zA-Z0-9_-]+$'), ),
+        error_messages={'unique': ('Логин уже занят!'), },
     )
     email = serializers.EmailField(
         required=True,
         validators=(
             UniqueValidator(
-                queryset=User.objects.all(),
-                error_messages={
-                    'unique': ('Данный email уже зарегестрирван!'),
-                }
-            ),
-        )
+                queryset=User.objects.all(),),),
+        error_messages={
+            'unique': ('Данный email уже зарегестрирван!'),
+        }
     )
 
     class Meta:
         model = User
         fields = ('username', 'email',)
 
+    class Meta:
+        model = User
+        fields = ('username', 'email',)
 
-class ProfileSerializer(
-    SignupSerializer,
-    UserSerializer
-):
+
+class ProfileSerializer(SignupSerializer, UserSerializer):
     role = serializers.CharField(read_only=True)
 
 
@@ -89,7 +86,49 @@ class TitlesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Titles
-        field = '__all__'
+        fields = '__all__'
 
     def get_rating(self, obj):
-        return obj.get_rating()
+        reviews = obj.review.all()
+        if reviews:
+            avg_scores = (
+                (sum(review.score for review in reviews))
+                /len(reviews)
+            )
+            return round(avg_scores,0)
+        return None
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    author = SlugRelatedField(slug_field='username', read_only=True)
+
+    class Meta:
+        model = Review
+        fields = '__all__'
+
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Review.objects.all(),
+                fields=('author', 'titles')
+            )
+        ]
+
+    def validate(self, data):
+        if data.get('score') not in data.get('score_value'):
+            raise serializers.ValidationError(
+                'Переданное значение "score" недопустимо.'
+                'Укажите число от 1 до 10.'
+            )
+        if not data.get('score'):
+            raise serializers.ValidationError('Задайте значение "score".')
+        return data
+
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    author = SlugRelatedField(slug_field='username', read_only=True)
+
+    class Meta:
+        model = Comment
+        field = '__all__'
+        read_only_field = ('review')
