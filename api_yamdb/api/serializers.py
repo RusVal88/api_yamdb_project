@@ -98,9 +98,9 @@ class TitlesSerializer(serializers.ModelSerializer):
         if reviews:
             avg_scores = (
                 (sum(review.score for review in reviews))
-                /len(reviews)
+                / len(reviews)
             )
-            return round(avg_scores,0)
+            return round(avg_scores, 0)
         return None
 
 
@@ -127,7 +127,6 @@ class ReviewSerializer(serializers.ModelSerializer):
         if not data.get('score'):
             raise serializers.ValidationError('Задайте значение "score".')
         return data
-
 
 
 class CommentSerializer(serializers.ModelSerializer):
