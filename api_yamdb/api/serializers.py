@@ -8,6 +8,7 @@ from rest_framework.validators import UniqueValidator, UniqueTogetherValidator
 from .validators import validate_username
 from review.models import Category, Genre, Titles, Review, Comment
 
+
 User = get_user_model()
 
 
@@ -66,12 +67,26 @@ class TokenSerializer(serializers.Serializer):
     )
 
 
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = ('name', 'slug')
+        model = Category
+
+
+class GenreSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = ('name', 'slug')
+        model = Genre
+
+
 class TitlesSerializer(serializers.ModelSerializer):
     rating = serializers.SerializerMethodField()
+    category = CategorySerializer(read_only=True)
+    genre = GenreSerializer(read_only=True)
 
     class Meta:
         model = Titles
-        field = ('rating')
+        field = '__all__'
 
     def get_rating(self, obj):
         return obj.get_rating()
