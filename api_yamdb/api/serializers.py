@@ -3,7 +3,7 @@ from django.contrib.auth.validators import UnicodeUsernameValidator
 
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
-from rest_framework.validators import UniqueValidator
+from rest_framework.validators import UniqueValidator, UniqueTogetherValidator
 
 from .validators import validate_username
 from review.models import Category, Genre, Titles, Review, Comment
@@ -83,6 +83,13 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = '__all__'
+
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Review.objects.all(),
+                fields=('author', 'titles')
+            )
+        ]
 
 
 class CommentSerializer(serializers.ModelSerializer):

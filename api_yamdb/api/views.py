@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
+from rest_framework.pagination import LimitOffsetPagination
 
 from api.permissions import AuthorOrReadOnlyPermission
 from api.serializers import (CommentSerializer, ReviewSerializer,
@@ -15,38 +16,35 @@ class TitleViewSet(viewsets.ReadOnlyModelViewSet):
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
     permission_classes = (AuthorOrReadOnlyPermission,)
+    pagination_class = LimitOffsetPagination
 
     def get_queryset(self):
-        title_id = self.kwargs.get('title_id')
-        title = get_object_or_404(Titles, id=title_id)
+        title = get_object_or_404(Titles, id=self.kwargs.get('title_id'))
         return title.review.all()
 
     def perform_create(self, serializer):
-        title_id = self.kwargs.get('title_id')
         serializer.save(
             author=self.request.user,
-            title=get_object_or_404(Titles, id=title_id)
+            title=get_object_or_404(Titles, id=self.kwargs.get('title_id'))
         )
 
 
 class CommentsViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
     permission_classes = (AuthorOrReadOnlyPermission, )
+    pagination_class = LimitOffsetPagination
 
     def get_queryset(self):
-        review_id = self.kwargs.get('review_id')
-        title_id = self.kwargs.get('title_id')
-        title = get_object_or_404(Titles, id=title_id)
-        review = get_object_or_404(Review, id=review_id)
+        title = get_object_or_404(Titles, id=self.kwargs.get('title_id'))
+        review = get_object_or_404(Review, id=self.kwargs.get('review_id'))
         return review.comments.filter(review=review, review__title=title)
 
     def perform_create(self, serializer):
-        review_id = self.kwargs.get('review_id')
-        title_id = self.kwargs.get('title_id')
+
         serializer.save(
             author=self.request.user,
-            review=get_object_or_404(Review, id=review_id),
-            title=get_object_or_404(Titles, id=title_id)
+            review=get_object_or_404(Review, id=self.kwargs.get('review_id')),
+            title=get_object_or_404(Titles, id=self.kwargs.get('title_id'))
         )
 
 
