@@ -94,7 +94,13 @@ class TitlesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Titles
-        fields = '__all__'
+        fields = ('id',
+                  'name',
+                  'year',
+                  'rating',
+                  'description',
+                  'genre',
+                  'category',)
 
     def get_rating(self, obj):
         reviews = obj.review.all()
@@ -103,7 +109,7 @@ class TitlesSerializer(serializers.ModelSerializer):
                 (sum(review.score for review in reviews))
                 / len(reviews)
             )
-            return round(avg_scores, 0)
+            return int(round(avg_scores, 0))
         return None
 
 
@@ -138,3 +144,4 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = ('id', 'text', 'author', 'pub_date')
+        read_only_field = ('review')
