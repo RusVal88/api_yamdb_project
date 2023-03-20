@@ -1,0 +1,393 @@
+# Регистрация нового пользователя
+POST http://127.0.0.1:8000/api/v1/auth/signup/
+Content-Type: application/json
+
+{
+    "email": "domosedov@yandex.com",
+    "username": "Владислав"
+}
+
+###
+POST  http://127.0.0.1:8000/api/v1/auth/signup/
+Content-Type: application/json
+
+{
+    "email": "plushkin.pietr@yandex.com",
+    "username": "Petiya"
+}
+
+###
+# Проверка на отстуствие обязательных полей или,
+# их некорректность. Должна выбрасываться ошибка 400.
+POST http://127.0.0.1:8000/api/v1/auth/signup/
+Content-Type: application/json
+
+{
+    "email": "velosiped,ov@yandex.com",
+    "username": "me"
+}
+###
+POST http://127.0.0.1:8000/api/v1/auth/signup/
+Content-Type: application/json
+
+{
+    "email": "velosiped,ov@yandex.com"
+}
+
+###
+POST http://127.0.0.1:8000/api/v1/auth/signup/
+Content-Type: application/json
+
+{
+    "username": "me"
+}
+
+###
+
+# ТОКЕН ПРИДЕТ НА ИМУЛЯТОР ПОЧТОВОГО ЯЩИКА,
+# ДИРЕКТОРИЯ api_yamdb/sent_emails.
+
+# Получение токена.
+POST http://127.0.0.1:8000/api/v1/auth/token/
+Content-Type: application/json
+
+{
+"username": "Владислав",
+"confirmation_code": "blcp4c-9627f883a7ef819eec096f227ea4ed2e"
+}
+
+###
+POST http://127.0.0.1:8000/api/v1/auth/token/
+Content-Type: application/json
+
+{
+"username": "Petiya",
+"confirmation_code": "blcz89-25bd1d2668fe854dae112952a78141ec"
+}
+
+###
+# Проверка на отстуствие обязательных полей или,
+# их некорректность. Должна выбрасываться ошибка 400.
+POST http://127.0.0.1:8000/api/v1/auth/token/
+Content-Type: application/json
+
+{
+    "confirmation_code": " ",
+    "username": "me"
+}
+
+###
+POST http://127.0.0.1:8000/api/v1/auth/token/
+Content-Type: application/json
+
+{
+    "confirmation_code": " "
+}
+
+###
+POST http://127.0.0.1:8000/api/v1/auth/token/
+Content-Type: application/json
+
+{
+    "username": "me"
+}
+
+###
+GET http://127.0.0.1:8000/api/v1/users/me/
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjc5ODczNTQ1LCJqdGkiOiI2M2M3Y2M0OTgzYzg0ZGQ4YjEwMWY1MTVkMjFiYjVkZiIsInVzZXJfaWQiOjF9.GnV684P7Vsj0lCKqHbpOCwXS73huwGT3YXFiWwswWiQ
+
+###
+# Получение данных своей учетной записи.
+# Права доступа: Любой авторизованный пользователь.
+# Запрос делает юзер Владислав.
+GET http://127.0.0.1:8000/api/v1/users/me/
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjc5ODg2NDU4LCJqdGkiOiI4MjYxNDkxNTE3Yzg0NTU1YTNiMDdiMzg3ZTVjZTM1ZiIsInVzZXJfaWQiOjN9.hywnF-c7aJ-STHBK9FGYR-eZpr5zL427c9h3QjF9X2E
+
+###
+# Получение данных своей учетной записи.
+# Права доступа: Любой авторизованный пользователь.
+# Запрос делает юзер Пётр.
+GET http://127.0.0.1:8000/api/v1/users/me/
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjc5ODk5NjEzLCJqdGkiOiI0NmE3NGIxNmFmYzY0NjhiOTU0MDI1ZDBhY2FmOTU3ZiIsInVzZXJfaWQiOjF9.BJbbKXbnjgvuQ_pUKc9SghvmtmIUEl_WuXI48uUw1kg
+
+###
+# Изменение данных своей учетной записи.
+# Права доступа: Любой авторизованный пользователь.
+# Запрос делает юзер Владислав.
+PATCH http://127.0.0.1:8000/api/v1/users/me/
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjc5ODg2NDU4LCJqdGkiOiI4MjYxNDkxNTE3Yzg0NTU1YTNiMDdiMzg3ZTVjZTM1ZiIsInVzZXJfaWQiOjN9.hywnF-c7aJ-STHBK9FGYR-eZpr5zL427c9h3QjF9X2E
+
+{
+    "first_name": "Влад",
+    "last_name": "Домоседов",
+    "bio": "Работник завода"
+}
+
+###
+# Изменение данных своей учетной записи.
+# Права доступа: Любой авторизованный пользователь.
+# Запрос делает юзер Пётр.
+PATCH http://127.0.0.1:8000/api/v1/users/me/
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjc5ODk5NjEzLCJqdGkiOiI0NmE3NGIxNmFmYzY0NjhiOTU0MDI1ZDBhY2FmOTU3ZiIsInVzZXJfaWQiOjF9.BJbbKXbnjgvuQ_pUKc9SghvmtmIUEl_WuXI48uUw1kg
+
+{
+  "username": "Petiya",
+  "first_name": "Пётр",
+  "last_name": "Плюшкин",
+  "role": "user",
+  "email": "plushkin.pietr@yandex.com",
+  "bio": "Студент Яндекс Практикума"
+}
+
+
+###
+# Проверка что юзеры не могут изменять роли. 
+PATCH http://127.0.0.1:8000/api/v1/users/me/
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjc5ODczNTQ1LCJqdGkiOiI2M2M3Y2M0OTgzYzg0ZGQ4YjEwMWY1MTVkMjFiYjVkZiIsInVzZXJfaWQiOjF9.GnV684P7Vsj0lCKqHbpOCwXS73huwGT3YXFiWwswWiQ
+
+{
+    "email": "plushkin.pietr@yandex.com",
+    "username": "Petiya",
+    "first_name": "Пётр",
+    "last_name": "Плюшкин",
+    "bio": "Студент Яндекс Практикума",
+    "role": "admin"
+}
+
+###
+# Создание пользователя, и присвоенного ему статуса Админ,
+# через админку сайта. 
+POST http://127.0.0.1:8000/api/v1/auth/signup/
+Content-Type: application/json
+
+{
+    "email": "ruslan.suhanoff@yandex.com",
+    "username": "Ruslan"
+}
+
+###
+
+POST http://127.0.0.1:8000/api/v1/auth/token/
+Content-Type: application/json
+
+{
+    "confirmation_code": "blcsef-2d02c4f8c2a4edb34818cc38984f07e7",
+    "username": "Ruslan"
+}
+
+###
+
+PATCH http://127.0.0.1:8000/api/v1/users/me/
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjc5ODkwNzc0LCJqdGkiOiI4ZTA3ZThhYTRmNmI0ZDc0YTdkZDk2MWQ5MjI5NjhiMCIsInVzZXJfaWQiOjJ9.D7Hi5QY91u5j6aTQInPKkBK7eDudL3zv3Jzd1JqYKa8
+
+{
+    "first_name": "Руслан",
+    "last_name": "Валишин",
+    "bio": "Студент Яндекс Практикума"
+}
+
+###
+# Проверка получения списка юзеров, права доступа: Админ.
+GET http://127.0.0.1:8000/api/v1/users/
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjc5ODkwNzc0LCJqdGkiOiI4ZTA3ZThhYTRmNmI0ZDc0YTdkZDk2MWQ5MjI5NjhiMCIsInVzZXJfaWQiOjJ9.D7Hi5QY91u5j6aTQInPKkBK7eDudL3zv3Jzd1JqYKa8
+
+###
+# Проверка получения списка юзеров админом, без токена
+# должна выбрасываться ошибка 401. 
+GET http://127.0.0.1:8000/api/v1/users/
+Content-Type: application/json
+
+###
+# Проверка прав доступа, права доступа: Админ,
+# юзер Пётр делает запрс, должна выбрасываться ошибка 403.
+GET http://127.0.0.1:8000/api/v1/users/
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjc5ODczNTQ1LCJqdGkiOiI2M2M3Y2M0OTgzYzg0ZGQ4YjEwMWY1MTVkMjFiYjVkZiIsInVzZXJfaWQiOjF9.GnV684P7Vsj0lCKqHbpOCwXS73huwGT3YXFiWwswWiQ
+
+###
+# Добавление пользователя админом(Руслан).
+POST http://127.0.0.1:8000/api/v1/users/
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjc5ODkwNzc0LCJqdGkiOiI4ZTA3ZThhYTRmNmI0ZDc0YTdkZDk2MWQ5MjI5NjhiMCIsInVzZXJfaWQiOjJ9.D7Hi5QY91u5j6aTQInPKkBK7eDudL3zv3Jzd1JqYKa8
+
+{
+    "username": "Igor22",
+    "email": "tapochkin.igor@yandex.ru"
+}
+
+###
+# Проверка добавления юзера админом, без токена
+# должна выбрасываться ошибка 401.
+POST http://127.0.0.1:8000/api/v1/users/
+Content-Type: application/json
+
+{
+    "username": "Vadim",
+    "email": "pupkin.vadim@yandex.ru"
+}
+
+###
+# Проверка отсутствия обязательного поля или они некорретны,
+# выбрасывается ошибка 400.
+POST http://127.0.0.1:8000/api/v1/users/
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjc5ODkwNzc0LCJqdGkiOiI4ZTA3ZThhYTRmNmI0ZDc0YTdkZDk2MWQ5MjI5NjhiMCIsInVzZXJfaWQiOjJ9.D7Hi5QY91u5j6aTQInPKkBK7eDudL3zv3Jzd1JqYKa8
+
+{
+    "username": "Vadim"
+}
+
+###
+POST http://127.0.0.1:8000/api/v1/users/
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjc5ODkwNzc0LCJqdGkiOiI4ZTA3ZThhYTRmNmI0ZDc0YTdkZDk2MWQ5MjI5NjhiMCIsInVzZXJfaWQiOjJ9.D7Hi5QY91u5j6aTQInPKkBK7eDudL3zv3Jzd1JqYKa8
+
+{
+    "email": "pupkin.vadim@yandex.ru"
+}
+
+###
+POST http://127.0.0.1:8000/api/v1/users/
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjc5ODkwNzc0LCJqdGkiOiI4ZTA3ZThhYTRmNmI0ZDc0YTdkZDk2MWQ5MjI5NjhiMCIsInVzZXJfaWQiOjJ9.D7Hi5QY91u5j6aTQInPKkBK7eDudL3zv3Jzd1JqYKa8
+
+{
+    "username": "Vik tor",
+    "email": "pupkin,vadim@yandex.ru"
+}
+
+###
+# Проверка прав доступа, разрешено только админу,
+# юзер Пётр делает запрс, должна выбрасываться ошибка 403.
+POST http://127.0.0.1:8000/api/v1/users/
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjc5ODczNTQ1LCJqdGkiOiI2M2M3Y2M0OTgzYzg0ZGQ4YjEwMWY1MTVkMjFiYjVkZiIsInVzZXJfaWQiOjF9.GnV684P7Vsj0lCKqHbpOCwXS73huwGT3YXFiWwswWiQ
+
+###
+# Получение пользователя по username, права доступа: Админ.
+GET http://127.0.0.1:8000/api/v1/users/Igor22/
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjc5ODkwNzc0LCJqdGkiOiI4ZTA3ZThhYTRmNmI0ZDc0YTdkZDk2MWQ5MjI5NjhiMCIsInVzZXJfaWQiOjJ9.D7Hi5QY91u5j6aTQInPKkBK7eDudL3zv3Jzd1JqYKa8
+
+###
+# Получение пользователя по username, права доступа: Админ.
+# Без токена. Должна выбрасываться ошибка 401.
+GET http://127.0.0.1:8000/api/v1/users/Igor22/
+Content-Type: application/json
+
+###
+# Проверка прав доступа, разрешено только админу,
+# юзер Пётр делает запрс, должна выбрасываться ошибка 403.
+GET http://127.0.0.1:8000/api/v1/users/Igor22/
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjc5ODczNTQ1LCJqdGkiOiI2M2M3Y2M0OTgzYzg0ZGQ4YjEwMWY1MTVkMjFiYjVkZiIsInVzZXJfaWQiOjF9.GnV684P7Vsj0lCKqHbpOCwXS73huwGT3YXFiWwswWiQ
+
+###
+# Получение не существующего пользователя по username,
+# запрос делает админ. Должна выбрасываться ошибка 404.
+GET http://127.0.0.1:8000/api/v1/users/Vadim/
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjc5ODkwNzc0LCJqdGkiOiI4ZTA3ZThhYTRmNmI0ZDc0YTdkZDk2MWQ5MjI5NjhiMCIsInVzZXJfaWQiOjJ9.D7Hi5QY91u5j6aTQInPKkBK7eDudL3zv3Jzd1JqYKa8
+
+###
+# Изменение данных пользователя по username,
+# права доступа: Админ.
+PATCH  http://127.0.0.1:8000/api/v1/users/Igor22/
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjc5ODkwNzc0LCJqdGkiOiI4ZTA3ZThhYTRmNmI0ZDc0YTdkZDk2MWQ5MjI5NjhiMCIsInVzZXJfaWQiOjJ9.D7Hi5QY91u5j6aTQInPKkBK7eDudL3zv3Jzd1JqYKa8
+
+{
+    "username": "Igor22",
+    "email": "tapochkin.igor@yandex.ru",
+    "role": "moderator",
+    "first_name": "Игорёк",
+    "last_name": "Тапочкин",
+    "bio": "Создан админом и награжден статусом модератор."
+}
+
+###
+###
+# Проверка отсутствия обязательного поля или они некорретны,
+# выбрасывается ошибка 400.
+PATCH  http://127.0.0.1:8000/api/v1/users/Igor22/
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjc5ODkwNzc0LCJqdGkiOiI4ZTA3ZThhYTRmNmI0ZDc0YTdkZDk2MWQ5MjI5NjhiMCIsInVzZXJfaWQiOjJ9.D7Hi5QY91u5j6aTQInPKkBK7eDudL3zv3Jzd1JqYKa8
+
+{
+    "email": "kolamoicev,ilya@yandex.ru"
+}
+
+###
+PATCH  http://127.0.0.1:8000/api/v1/users/Igor22/
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjc5ODkwNzc0LCJqdGkiOiI4ZTA3ZThhYTRmNmI0ZDc0YTdkZDk2MWQ5MjI5NjhiMCIsInVzZXJfaWQiOjJ9.D7Hi5QY91u5j6aTQInPKkBK7eDudL3zv3Jzd1JqYKa8
+
+{
+    "username": "Igo r22"
+}
+
+###
+PATCH  http://127.0.0.1:8000/api/v1/users/Igor22/
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjc5ODkwNzc0LCJqdGkiOiI4ZTA3ZThhYTRmNmI0ZDc0YTdkZDk2MWQ5MjI5NjhiMCIsInVzZXJfaWQiOjJ9.D7Hi5QY91u5j6aTQInPKkBK7eDudL3zv3Jzd1JqYKa8
+
+###
+# Изменение данных пользователя по username, права доступа: Админ.
+# Без токена. Должна выбрасываться ошибка 401.
+PATCH  http://127.0.0.1:8000/api/v1/users/Igor22/
+Content-Type: application/json
+
+###
+# Проверка прав доступа, разрешено только админу,
+# юзер Пётр делает запрс, должна выбрасываться ошибка 403.
+PATCH http://127.0.0.1:8000/api/v1/users/Igor22/
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjc5ODczNTQ1LCJqdGkiOiI2M2M3Y2M0OTgzYzg0ZGQ4YjEwMWY1MTVkMjFiYjVkZiIsInVzZXJfaWQiOjF9.GnV684P7Vsj0lCKqHbpOCwXS73huwGT3YXFiWwswWiQ
+
+###
+# Изменение не существующего пользователя по username,
+# запрос делает админ. Должна выбрасываться ошибка 404.
+GET http://127.0.0.1:8000/api/v1/users/Vadim/
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjc5ODkwNzc0LCJqdGkiOiI4ZTA3ZThhYTRmNmI0ZDc0YTdkZDk2MWQ5MjI5NjhiMCIsInVzZXJfaWQiOjJ9.D7Hi5QY91u5j6aTQInPKkBK7eDudL3zv3Jzd1JqYKa8
+
+###
+# Удаление пользователя по username,
+# Права доступа: Админ.
+DELETE  http://127.0.0.1:8000/api/v1/users/Igor22/
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjc5ODkwNzc0LCJqdGkiOiI4ZTA3ZThhYTRmNmI0ZDc0YTdkZDk2MWQ5MjI5NjhiMCIsInVzZXJfaWQiOjJ9.D7Hi5QY91u5j6aTQInPKkBK7eDudL3zv3Jzd1JqYKa8
+
+###
+# Удаление пользователя по username, права доступа: Админ.
+# Без токена. Должна выбрасываться ошибка 401.
+DELETE  http://127.0.0.1:8000/api/v1/users/Petiya/
+Content-Type: application/json
+
+###
+# Проверка прав доступа, разрешено только админу,
+# юзер Пётр делает запрс на удаление, должна выбрасываться ошибка 403.
+DELETE http://127.0.0.1:8000/api/v1/users/Igor22/
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjc5ODczNTQ1LCJqdGkiOiI2M2M3Y2M0OTgzYzg0ZGQ4YjEwMWY1MTVkMjFiYjVkZiIsInVzZXJfaWQiOjF9.GnV684P7Vsj0lCKqHbpOCwXS73huwGT3YXFiWwswWiQ
+
+###
+# Удаление не существующего пользователя по username,
+# запрос делает админ. Должна выбрасываться ошибка 404.
+GET http://127.0.0.1:8000/api/v1/users/Vadim/
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjc5ODkwNzc0LCJqdGkiOiI4ZTA3ZThhYTRmNmI0ZDc0YTdkZDk2MWQ5MjI5NjhiMCIsInVzZXJfaWQiOjJ9.D7Hi5QY91u5j6aTQInPKkBK7eDudL3zv3Jzd1JqYKa8
+
+###
+# Проверка получения списка юзеров, права доступа: Админ.
+GET http://127.0.0.1:8000/api/v1/users/
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjc5ODkwNzc0LCJqdGkiOiI4ZTA3ZThhYTRmNmI0ZDc0YTdkZDk2MWQ5MjI5NjhiMCIsInVzZXJfaWQiOjJ9.D7Hi5QY91u5j6aTQInPKkBK7eDudL3zv3Jzd1JqYKa8
