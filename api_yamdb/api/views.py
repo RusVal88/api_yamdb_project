@@ -13,7 +13,6 @@ from review.models import Comment, Review, Titles, User, Category, Genre
 class TitleViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Titles.objects.all()
     serializer_class = TitlesSerializer
-    pagination_class = LimitOffsetPagination
     permission_classes = (AdminOrReadOnlyPermission, )
 
 
