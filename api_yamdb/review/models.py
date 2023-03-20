@@ -76,7 +76,6 @@ class Titles(models.Model):
         help_text='Введите название произведения',
     )
 
-
     def __str__(self):
         return self.name
 

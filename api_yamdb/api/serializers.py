@@ -42,7 +42,6 @@ class SignupSerializer(serializers.ModelSerializer):
             'unique': ('Данный email уже зарегестрирван!'),
         }
     )
-        
 
     class Meta:
         model = User
@@ -118,7 +117,7 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Review
-        fields = ('id', 'text', 'author', 'score', 'pub_date') 
+        fields = ('id', 'text', 'author', 'score', 'pub_date')
 
         validators = [
             UniqueTogetherValidator(
@@ -144,4 +143,4 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = ('id', 'text', 'author', 'pub_date')
-        read_only_field = ('review')
+        read_only_field = ('review',)
