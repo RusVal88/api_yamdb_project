@@ -114,7 +114,7 @@ def token(request):
             status=HTTPStatus.OK
         )
     return Response(
-        {'error_message': 'Неверный код или логин пользоватея!'},
+        {'error_message': 'Неверный код или логин пользователя!'},
         status=HTTPStatus.BAD_REQUEST)
 
 
