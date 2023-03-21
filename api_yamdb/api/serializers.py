@@ -42,7 +42,6 @@ class SignupSerializer(serializers.ModelSerializer):
             'unique': ('Данный email уже зарегестрирван!'),
         }
     )
-        
 
     class Meta:
         model = User
@@ -109,7 +108,7 @@ class TitlesSerializer(serializers.ModelSerializer):
                 (sum(review.score for review in reviews))
                 / len(reviews)
             )
-            return round(avg_scores, 0)
+            return int(round(avg_scores, 0))
         return None
 
 
@@ -118,7 +117,7 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Review
-        fields = '__all__'
+        fields = ('id', 'text', 'author', 'score', 'pub_date')
 
         validators = [
             UniqueTogetherValidator(
@@ -143,5 +142,5 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        field = '__all__'
-        read_only_field = ('review')
+        fields = ('id', 'text', 'author', 'pub_date')
+        read_only_field = ('review',)

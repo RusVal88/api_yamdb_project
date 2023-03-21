@@ -7,7 +7,7 @@ from api.permissions import (AuthorOrReadOnlyPermission,
 from api.serializers import (CommentSerializer, ReviewSerializer,
                              TitlesSerializer, UserSerializer,
                              CategorySerializer, GenreSerializer,)
-from review.models import Comment, Review, Titles, User, Category, Genre
+from review.models import Review, Titles, User, Category, Genre
 
 
 class TitleViewSet(viewsets.ReadOnlyModelViewSet):
@@ -52,10 +52,9 @@ class CommentsViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         title = get_object_or_404(Titles, id=self.kwargs.get('title_id'))
         review = get_object_or_404(Review, id=self.kwargs.get('review_id'))
-        return review.comments.filter(review=review, review__title=title)
+        return review.comments.filter(review=review, review__titles=title)
 
     def perform_create(self, serializer):
-
         serializer.save(
             author=self.request.user,
             review=get_object_or_404(Review, id=self.kwargs.get('review_id')),
