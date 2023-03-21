@@ -47,14 +47,6 @@ class SignupSerializer(serializers.ModelSerializer):
         model = User
         fields = ('username', 'email',)
 
-    class Meta:
-        model = User
-        fields = ('username', 'email',)
-
-    class Meta:
-        model = User
-        fields = ('username', 'email',)
-
 
 class ProfileSerializer(SignupSerializer, UserSerializer):
     role = serializers.CharField(read_only=True)
