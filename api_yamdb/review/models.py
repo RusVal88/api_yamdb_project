@@ -45,25 +45,6 @@ class Genre(models.Model):
 
 
 class Titles(models.Model):
-    name = models.CharField(
-        max_length=256,
-        verbose_name='Произведение',
-        help_text='Введите название произведения',
-    )
-    year = models.IntegerField(
-        verbose_name='Год создания',
-        help_text='Укажите год создания произведения',
-    )
-    description = models.TextField(
-        verbose_name='Описание произведения',
-        help_text='О чем данное произведение?',
-        blank=True,
-    )
-    genre = models.ManyToManyField(
-        Genre,
-        verbose_name='Жанр',
-        help_text='Выберите жанр',
-    )
     category = models.ForeignKey(
         Category,
         verbose_name='Категория',
@@ -71,10 +52,29 @@ class Titles(models.Model):
         null=True,
         on_delete=models.SET_NULL,
     )
+    genre = models.ManyToManyField(
+        Genre,
+        verbose_name='Жанр',
+        help_text='Выберите жанр',
+    )
+    description = models.TextField(
+        verbose_name='Описание произведения',
+        help_text='О чем данное произведение?',
+        blank=True,
+    )
     rating = models.PositiveSmallIntegerField(
         null=True,
         blank=True,
         verbose_name='Рейтинг',
+    )
+    year = models.IntegerField(
+        verbose_name='Год создания',
+        help_text='Укажите год создания произведения',
+    )
+    name = models.CharField(
+        max_length=256,
+        verbose_name='Произведение',
+        help_text='Введите название произведения',
     )
 
     def __str__(self):

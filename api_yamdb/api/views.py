@@ -13,12 +13,13 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 
 from api.permissions import (AuthorOrReadOnlyPermission,
-                             IsAdminOrSuperUser,)
+                             IsAdminOrSuperUser, AdminOrReadOnlyPermission)
 from api.serializers import (CommentSerializer, ReviewSerializer,
                              TitlesSerializer, UserSerializer,
                              SignUpSerializer, ProfileSerializer,
-                             TokenSerializer)
-from review.models import Review, Titles
+                             TokenSerializer, CategorySerializer,
+                             GenreSerializer,)
+from review.models import Review, Titles, Category, Genre
 from api_yamdb.settings import DEFAULT_FROM_EMAIL
 
 User = get_user_model()
@@ -27,6 +28,19 @@ User = get_user_model()
 class TitleViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Titles.objects.all()
     serializer_class = TitlesSerializer
+    permission_classes = (AdminOrReadOnlyPermission, )
+
+
+class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = (AdminOrReadOnlyPermission, )
+
+
+class GenreViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
+    permission_classes = (AdminOrReadOnlyPermission, )
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
@@ -53,10 +67,9 @@ class CommentsViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         title = get_object_or_404(Titles, id=self.kwargs.get('title_id'))
         review = get_object_or_404(Review, id=self.kwargs.get('review_id'))
-        return review.comments.filter(review=review, review__title=title)
+        return review.comments.filter(review=review, review__titles=title)
 
     def perform_create(self, serializer):
-
         serializer.save(
             author=self.request.user,
             review=get_object_or_404(Review, id=self.kwargs.get('review_id')),
