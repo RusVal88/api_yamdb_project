@@ -1,5 +1,22 @@
 from django.contrib import admin
+from django.contrib.auth import get_user_model
 
-from .models import User
+User = get_user_model()
 
-admin.site.register(User)
+
+class UserAdmin(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'username',
+        'email',
+        'role',
+        'bio',
+        'first_name',
+        'last_name',
+    )
+    list_editable = ('role',)
+    list_filter = ('username', 'role',)
+    search_fields = ('username', 'role',)
+
+
+admin.site.register(User, UserAdmin)
