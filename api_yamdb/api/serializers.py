@@ -1,10 +1,13 @@
+from django.contrib.auth import get_user_model
+
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 from rest_framework.validators import UniqueValidator, UniqueTogetherValidator
 
 from users.validators import validate_username
 from review.models import Category, Genre, Titles, Review, Comment
-from users.models import User
+
+User = get_user_model()
 
 
 class SignUpSerializer(serializers.ModelSerializer):
@@ -64,11 +67,11 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = (
             'username',
+            'email',
             'first_name',
             'last_name',
-            'role',
-            'email',
             'bio',
+            'role',
         )
 
 
@@ -89,11 +92,11 @@ class ProfileSerializer(serializers.ModelSerializer):
         model = User
         fields = (
             'username',
+            'email',
             'first_name',
             'last_name',
-            'role',
-            'email',
             'bio',
+            'role',
         )
         read_only_fields = ('role',)
 

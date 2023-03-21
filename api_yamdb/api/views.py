@@ -1,6 +1,7 @@
 from http import HTTPStatus
 
 from django.contrib.auth.tokens import default_token_generator
+from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from django.core.mail import send_mail
 
@@ -19,7 +20,8 @@ from api.serializers import (CommentSerializer, ReviewSerializer,
                              TokenSerializer)
 from review.models import Review, Titles
 from api_yamdb.settings import DEFAULT_FROM_EMAIL
-from users.models import User
+
+User = get_user_model()
 
 
 class TitleViewSet(viewsets.ReadOnlyModelViewSet):

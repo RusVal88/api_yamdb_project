@@ -18,7 +18,7 @@ class AuthorOrReadOnlyPermission(permissions.BasePermission):
 
 class IsAdminOrSuperUser(permissions.BasePermission):
     message = (
-        'Получить username, может только Админ или суперюзер.'
+        'Получить username может только Админ или суперюзер.'
     )
 
     def has_permission(self, request, view):
