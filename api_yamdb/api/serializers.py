@@ -143,21 +143,31 @@ class TitlesSerializer(serializers.ModelSerializer):
 
 
 class ReviewSerializer(serializers.ModelSerializer):
-    author = SlugRelatedField(slug_field='username', read_only=True)
+    author = serializers.SlugRelatedField(
+        slug_field='username',
+        read_only=True,
+        default=serializers.CurrentUserDefault()
+    )
+    #title = serializers.SlugRelatedField(
+    #     slug_field='name',
+    #     read_only=True,
+    #     allow_null=True
+    # )
 
     class Meta:
         model = Review
-        fields = ('id', 'text', 'author', 'score', 'pub_date')
+        fields = ('id', 'text', 'author', 'score', 'pub_date', )#'title')
 
-        validators = [
-            UniqueTogetherValidator(
-                queryset=Review.objects.all(),
-                fields=('author', 'title')
-            )
-        ]
+        #validators = [
+        #     UniqueTogetherValidator(
+        #         queryset=Review.objects.all(),
+        #         fields=('author', 'title')
+        #     )
+        # ]
 
     def validate(self, data):
-        if data.get('score') not in data.get('score_value'):
+        score_value = [value for value in range(1, 11)]
+        if data.get('score') not in score_value:
             raise serializers.ValidationError(
                 'Переданное значение "score" недопустимо.'
                 'Укажите число от 1 до 10.'

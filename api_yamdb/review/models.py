@@ -112,6 +112,8 @@ class Review(models.Model):
         verbose_name='Произведение',
         on_delete=models.CASCADE,
         related_name='review',
+        blank=True, 
+        null=True
     )
 
     def __str__(self):
