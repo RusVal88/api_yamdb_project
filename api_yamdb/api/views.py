@@ -25,19 +25,19 @@ from api_yamdb.settings import DEFAULT_FROM_EMAIL
 User = get_user_model()
 
 
-class TitleViewSet(viewsets.ReadOnlyModelViewSet):
+class TitleViewSet(viewsets.ModelViewSet):
     queryset = Titles.objects.all()
     serializer_class = TitlesSerializer
     permission_classes = (AdminOrReadOnlyPermission, )
 
 
-class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
+class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = (AdminOrReadOnlyPermission, )
 
 
-class GenreViewSet(viewsets.ReadOnlyModelViewSet):
+class GenreViewSet(viewsets.ModelViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permission_classes = (AdminOrReadOnlyPermission, )
@@ -46,7 +46,6 @@ class GenreViewSet(viewsets.ReadOnlyModelViewSet):
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
     permission_classes = (AuthorOrReadOnlyPermission,)
-    pagination_class = LimitOffsetPagination
 
     def get_queryset(self):
         title = get_object_or_404(Titles, id=self.kwargs.get('title_id'))
@@ -62,7 +61,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 class CommentsViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
     permission_classes = (AuthorOrReadOnlyPermission, )
-    pagination_class = LimitOffsetPagination
+
 
     def get_queryset(self):
         title = get_object_or_404(Titles, id=self.kwargs.get('title_id'))

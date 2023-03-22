@@ -34,5 +34,5 @@ class AdminOrReadOnlyPermission(permissions.BasePermission):
             return True
         return (
             request.user.is_authenticated
-            and request.user.is_admin
+            and (request.user.role == User.Role.ADMIN)
         )

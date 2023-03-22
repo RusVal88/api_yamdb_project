@@ -107,7 +107,7 @@ class Review(models.Model):
         help_text='Выберите оценку от 1 до 10',
         choices=score_value,
     )
-    titles = models.ForeignKey(
+    title = models.ForeignKey(
         Titles,
         verbose_name='Произведение',
         on_delete=models.CASCADE,
@@ -120,8 +120,8 @@ class Review(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=['author', 'titles', ],
-                name='unique_author_titles'
+                fields=['author', 'title', ],
+                name='unique_author_title'
             )
         ]
 
