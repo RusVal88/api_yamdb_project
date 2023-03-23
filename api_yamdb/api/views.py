@@ -1,29 +1,29 @@
 from http import HTTPStatus
 
-from api_yamdb.settings import DEFAULT_FROM_EMAIL
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
+from django.db import IntegrityError
 from django.shortcuts import get_object_or_404
-
-from rest_framework import filters, permissions, mixins, viewsets
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters, mixins, permissions, serializers, viewsets
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
-from django_filters.rest_framework import DjangoFilterBackend
 
 from api.filters import TitlesFilter
-from reviews.models import Category, Genre, Review, Title
-
 from api.permissions import (AdminOrReadOnlyPermission,
                              AuthorAndStaffOrReadOnlyPermission,
                              IsAdminOrSuperUser)
 from api.serializers import (CategorySerializer, CommentSerializer,
                              GenreSerializer, ProfileSerializer,
                              ReviewSerializer, SignUpSerializer,
-                             TitleSerializer, TokenSerializer, UserSerializer,
-                             TitleCCDSerializer)
+                             TitleCCDSerializer, TitleSerializer,
+                             TokenSerializer, UserSerializer)
+from api_yamdb.settings import DEFAULT_FROM_EMAIL
+from reviews.models import Category, Genre, Review, Title
+
 
 User = get_user_model()
 
@@ -70,22 +70,28 @@ class GenreViewSet(
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    permission_classes = (AuthorAndStaffOrReadOnlyPermission, IsAuthenticatedOrReadOnly)
+    permission_classes = (AuthorAndStaffOrReadOnlyPermission,
+                          IsAuthenticatedOrReadOnly)
 
     def get_queryset(self):
         title = get_object_or_404(Title, id=self.kwargs.get('title_id'))
         return title.review.all()
 
     def perform_create(self, serializer):
-        serializer.save(
-            author=self.request.user,
-            title=get_object_or_404(Title, id=self.kwargs.get('title_id'))
-        )
+        try:
+            serializer.save(
+                author=self.request.user,
+                title=get_object_or_404(Title, id=self.kwargs.get('title_id'))
+            )
+        except IntegrityError:
+            raise serializers.ValidationError('Вы уже оставляли отзыв на'
+                                              'этот фильм')
 
 
 class CommentsViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
-    permission_classes = (AuthorAndStaffOrReadOnlyPermission, IsAuthenticatedOrReadOnly)
+    permission_classes = (AuthorAndStaffOrReadOnlyPermission,
+                          IsAuthenticatedOrReadOnly)
 
     def get_queryset(self):
         title = get_object_or_404(Title, id=self.kwargs.get('title_id'))

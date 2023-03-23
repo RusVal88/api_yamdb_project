@@ -1,7 +1,7 @@
+import datetime
 import re
 
 from rest_framework.validators import ValidationError
-import datetime
 
 
 def validate_username(value):
