@@ -24,55 +24,55 @@ class Command(BaseCommand):
             for row in csv.DictReader(
                 open('./static/data/users.csv', encoding='utf-8')
             ):
-                child = User(
+                new_table  = User(
                     id=row['id'],
                     username=row['username'],
                     email=row['email'],
                     role=row['role'],
                     bio=row['bio'],
                 )
-                child.save()
+                new_table .save()
             for row in csv.DictReader(
                 open('./static/data/category.csv', encoding='utf-8')
             ):
-                child = Category(
+                new_table  = Category(
                     id=row['id'],
                     name=row['name'],
                     slug=row['slug'],
                 )
-                child.save()
+                new_table .save()
             for row in csv.DictReader(
                 open('./static/data/genre.csv', encoding='utf-8')
             ):
-                child = Genre(
+                new_table  = Genre(
                     id=row['id'],
                     name=row['name'],
                     slug=row['slug'],
                 )
-                child.save()
+                new_table .save()
             for row in csv.DictReader(
                 open('./static/data/titles.csv', encoding='utf-8')
             ):
-                child = Title(
+                new_table  = Title(
                     id=row['id'],
                     name=row['name'],
                     year=row['year'],
                     category=Category.objects.get(pk=row['category']),
                 )
-                child.save()
+                new_table .save()
             for row in csv.DictReader(
                 open('./static/data/genre_title.csv', encoding='utf-8')
             ):
-                child = GenreTitle(
+                new_table  = GenreTitle(
                     id=row['id'],
                     title=Title.objects.get(pk=row['title_id']),
                     genre=Genre.objects.get(pk=row['genre_id']),
                 )
-                child.save()
+                new_table .save()
             for row in csv.DictReader(
                 open('./static/data/review.csv', encoding='utf-8')
             ):
-                child = Review(
+                new_table  = Review(
                     id=row['id'],
                     title=Title.objects.get(pk=row['title_id']),
                     text=row['text'],
@@ -80,18 +80,18 @@ class Command(BaseCommand):
                     score=row['score'],
                     pub_date=row['pub_date'],
                 )
-                child.save()
+                new_table .save()
             for row in csv.DictReader(
                 open('./static/data/comments.csv', encoding='utf-8')
             ):
-                child = Comment(
+                new_table  = Comment(
                     id=row['id'],
                     review=Review.objects.get(pk=row['review_id']),
                     text=row['text'],
                     author=User.objects.get(pk=row['author']),
                     pub_date=row['pub_date'],
                 )
-                child.save()
+                new_table .save()
         except ValueError:
             print('Значение неопределенно')
         except Exception:
