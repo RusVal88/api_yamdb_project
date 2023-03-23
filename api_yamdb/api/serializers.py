@@ -4,7 +4,7 @@ from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 from rest_framework.validators import UniqueValidator, UniqueTogetherValidator
 
-from users.validators import validate_username
+from .validators import validate_username
 from review.models import Category, Genre, Titles, Review, Comment
 
 User = get_user_model()
