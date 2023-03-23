@@ -11,7 +11,7 @@ from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
-from reviews.models import Category, Genre, Review, Titles
+from reviews.models import Category, Genre, Review, Title
 
 from api.permissions import (AdminOrReadOnlyPermission,
                              AuthorAndStaffOrReadOnlyPermission,
@@ -19,14 +19,14 @@ from api.permissions import (AdminOrReadOnlyPermission,
 from api.serializers import (CategorySerializer, CommentSerializer,
                              GenreSerializer, ProfileSerializer,
                              ReviewSerializer, SignUpSerializer,
-                             TitlesSerializer, TokenSerializer, UserSerializer)
+                             TitleSerializer, TokenSerializer, UserSerializer)
 
 User = get_user_model()
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    queryset = Titles.objects.all()
-    serializer_class = TitlesSerializer
+    queryset = Title.objects.all()
+    serializer_class = TitleSerializer
     permission_classes = (AdminOrReadOnlyPermission, )
 
 
@@ -47,13 +47,13 @@ class ReviewViewSet(viewsets.ModelViewSet):
     permission_classes = (AuthorAndStaffOrReadOnlyPermission, IsAuthenticatedOrReadOnly)
 
     def get_queryset(self):
-        title = get_object_or_404(Titles, id=self.kwargs.get('title_id'))
+        title = get_object_or_404(Title, id=self.kwargs.get('title_id'))
         return title.review.all()
 
     def perform_create(self, serializer):
         serializer.save(
             author=self.request.user,
-            title=get_object_or_404(Titles, id=self.kwargs.get('title_id'))
+            title=get_object_or_404(Title, id=self.kwargs.get('title_id'))
         )
 
 
@@ -62,7 +62,7 @@ class CommentsViewSet(viewsets.ModelViewSet):
     permission_classes = (AuthorAndStaffOrReadOnlyPermission, IsAuthenticatedOrReadOnly)
 
     def get_queryset(self):
-        title = get_object_or_404(Titles, id=self.kwargs.get('title_id'))
+        title = get_object_or_404(Title, id=self.kwargs.get('title_id'))
         review = get_object_or_404(Review, id=self.kwargs.get('review_id'))
         return review.comments.filter(review=review, review__title=title)
 

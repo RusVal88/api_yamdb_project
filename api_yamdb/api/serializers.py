@@ -4,7 +4,7 @@ from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 from rest_framework.validators import UniqueValidator
 
-from reviews.models import Category, Genre, Titles, Review, Comment
+from reviews.models import Category, Genre, Title, Review, Comment
 from users.validators import validate_username
 
 User = get_user_model()
@@ -113,7 +113,7 @@ class GenreSerializer(serializers.ModelSerializer):
         model = Genre
 
 
-class TitlesSerializer(serializers.ModelSerializer):
+class TitleSerializer(serializers.ModelSerializer):
     rating = serializers.SerializerMethodField()
     category = CategorySerializer(read_only=True)
     genre = GenreSerializer(
@@ -122,7 +122,7 @@ class TitlesSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        model = Titles
+        model = Title
         fields = ('id',
                   'name',
                   'year',
