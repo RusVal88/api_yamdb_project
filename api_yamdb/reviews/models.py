@@ -1,5 +1,9 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from rest_framework.exceptions import ValidationError
+
+from rest_framework import serializers
+
 
 from api.validators import validate_year
 
@@ -46,7 +50,7 @@ class Genre(models.Model):
         return self.name
 
 
-class Titles(models.Model):
+class Title(models.Model):
     category = models.ForeignKey(
         Category,
         verbose_name='Категория',
@@ -111,7 +115,7 @@ class Review(models.Model):
         choices=score_value,
     )
     title = models.ForeignKey(
-        Titles,
+        Title,
         verbose_name='Произведение',
         on_delete=models.CASCADE,
         related_name='review',
@@ -120,13 +124,10 @@ class Review(models.Model):
     def __str__(self):
         return self.text[:300]
 
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=['author', 'title', ],
-                name='unique_author_title'
-            )
-        ]
+    def save(self, *args, **kwargs):
+        if Review.objects.filter(author=self.author, title=self.title).exists():
+            raise ValidationError('Вы уже делали обзор на данное произведение')
+        super().save(*args, **kwargs)
 
 
 class Comment(models.Model):
