@@ -121,10 +121,10 @@ class Review(models.Model):
     def __str__(self):
         return self.text[:300]
 
-    # def save(self, *args, **kwargs):
-    #     if Review.objects.filter(author=self.author, title=self.title).exists():
-    #         raise ValidationError('Вы уже делали обзор на данное произведение')
-    #     super().save(*args, **kwargs)
+    def save(self, *args, **kwargs):
+        if Review.objects.filter(author=self.author, title=self.title).exists():
+            raise ValidationError('Вы уже делали обзор на данное произведение')
+        super().save(*args, **kwargs)
 
 
 class Comment(models.Model):

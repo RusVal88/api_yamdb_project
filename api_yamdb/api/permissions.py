@@ -4,12 +4,15 @@ from users.models import User
 
 class AuthorAndStaffOrReadOnlyPermission(permissions.BasePermission):
 
+
     def has_object_permission(self, request, view, obj):
         '''Аутентификация создателя объекта'''
         if request.method in permissions.SAFE_METHODS:
             return True
-        return ((request.user == obj.author) or (request.user.is_superuser
-                 or request.user.role != User.Role.USER))
+        return ((request.user == obj.author) or request.user.is_superuser
+                 or (request.user.role != User.Role.USER))
+
+
 
 
 class IsAdminOrSuperUser(permissions.BasePermission):
