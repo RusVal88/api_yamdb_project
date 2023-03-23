@@ -11,7 +11,7 @@ from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
-from review.models import Category, Genre, Review, Titles
+from reviews.models import Category, Genre, Review, Titles
 
 from api.permissions import (AdminOrReadOnlyPermission,
                              AuthorAndStaffOrReadOnlyPermission,
