@@ -5,6 +5,8 @@ from rest_framework.exceptions import ValidationError
 from rest_framework import serializers
 
 
+from api.validators import validate_year
+
 User = get_user_model()
 
 
@@ -74,6 +76,7 @@ class Title(models.Model):
     year = models.IntegerField(
         verbose_name='Год создания',
         help_text='Укажите год создания произведения',
+        validators=[validate_year],
     )
     name = models.CharField(
         max_length=256,

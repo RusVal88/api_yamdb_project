@@ -1,6 +1,7 @@
 import re
 
 from rest_framework.validators import ValidationError
+import datetime
 
 
 def validate_username(value):
@@ -11,5 +12,13 @@ def validate_username(value):
     if not re.match(r'^[\w.@+-]+\Z', value):
         raise ValidationError(
             'Введены некоректные символы!'
+        )
+    return value
+
+
+def validate_year(value):
+    if value > datetime.date.today().year:
+        raise ValidationError(
+            'Машина времени ещё не изобретена, поменяй год!'
         )
     return value
