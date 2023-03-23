@@ -1,5 +1,8 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
+
+from rest_framework import serializers
 
 User = get_user_model()
 
@@ -112,20 +115,15 @@ class Review(models.Model):
         verbose_name='Произведение',
         on_delete=models.CASCADE,
         related_name='review',
-        blank=True, 
-        null=True
     )
 
     def __str__(self):
         return self.text[:300]
 
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=['author', 'title', ],
-                name='unique_author_title'
-            )
-        ]
+    def save(self, *args, **kwargs):
+        if Review.objects.filter(author=self.author, title=self.title).exists():
+            raise serializers.ValidationError('Вы уже делали обзор на данное произведение')
+        super().save(*args, **kwargs)
 
 
 class Comment(models.Model):

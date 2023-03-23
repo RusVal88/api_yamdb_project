@@ -1,26 +1,25 @@
 from http import HTTPStatus
 
-from django.contrib.auth.tokens import default_token_generator
+from api_yamdb.settings import DEFAULT_FROM_EMAIL
 from django.contrib.auth import get_user_model
-from django.shortcuts import get_object_or_404
+from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
+from django.shortcuts import get_object_or_404
 
-from rest_framework import viewsets, filters, permissions
-from rest_framework.pagination import LimitOffsetPagination
-from rest_framework.decorators import (api_view, permission_classes,
-                                       action)
+from rest_framework import filters, permissions, viewsets
+from rest_framework.decorators import action, api_view, permission_classes
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
+from review.models import Category, Genre, Review, Titles
 
-from api.permissions import (AuthorOrReadOnlyPermission,
-                             IsAdminOrSuperUser, AdminOrReadOnlyPermission)
-from api.serializers import (CommentSerializer, ReviewSerializer,
-                             TitlesSerializer, UserSerializer,
-                             SignUpSerializer, ProfileSerializer,
-                             TokenSerializer, CategorySerializer,
-                             GenreSerializer,)
-from review.models import Review, Titles, Category, Genre
-from api_yamdb.settings import DEFAULT_FROM_EMAIL
+from api.permissions import (AdminOrReadOnlyPermission,
+                             AuthorAndStaffOrReadOnlyPermission,
+                             IsAdminOrSuperUser)
+from api.serializers import (CategorySerializer, CommentSerializer,
+                             GenreSerializer, ProfileSerializer,
+                             ReviewSerializer, SignUpSerializer,
+                             TitlesSerializer, TokenSerializer, UserSerializer)
 
 User = get_user_model()
 
@@ -45,7 +44,7 @@ class GenreViewSet(viewsets.ModelViewSet):
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    permission_classes = (AuthorOrReadOnlyPermission,)
+    permission_classes = (AuthorAndStaffOrReadOnlyPermission, IsAuthenticatedOrReadOnly)
 
     def get_queryset(self):
         title = get_object_or_404(Titles, id=self.kwargs.get('title_id'))
@@ -60,19 +59,17 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 class CommentsViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
-    permission_classes = (AuthorOrReadOnlyPermission, )
-
+    permission_classes = (AuthorAndStaffOrReadOnlyPermission, IsAuthenticatedOrReadOnly)
 
     def get_queryset(self):
         title = get_object_or_404(Titles, id=self.kwargs.get('title_id'))
         review = get_object_or_404(Review, id=self.kwargs.get('review_id'))
-        return review.comments.filter(review=review, review__titles=title)
+        return review.comments.filter(review=review, review__title=title)
 
     def perform_create(self, serializer):
         serializer.save(
             author=self.request.user,
             review=get_object_or_404(Review, id=self.kwargs.get('review_id')),
-            title=get_object_or_404(Titles, id=self.kwargs.get('title_id'))
         )
 
 
@@ -124,7 +121,6 @@ class UserViewSet(viewsets.ModelViewSet):
     lookup_field = 'username'
     filter_backends = (filters.SearchFilter,)
     search_fields = ('=username',)
-    pagination_class = LimitOffsetPagination
     http_method_names = ['get', 'post', 'patch', 'delete']
 
     @action(

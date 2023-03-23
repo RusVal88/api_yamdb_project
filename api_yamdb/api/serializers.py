@@ -2,10 +2,10 @@ from django.contrib.auth import get_user_model
 
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
-from rest_framework.validators import UniqueValidator, UniqueTogetherValidator
+from rest_framework.validators import UniqueValidator
 
-from users.validators import validate_username
 from review.models import Category, Genre, Titles, Review, Comment
+from users.validators import validate_username
 
 User = get_user_model()
 
@@ -148,22 +148,10 @@ class ReviewSerializer(serializers.ModelSerializer):
         read_only=True,
         default=serializers.CurrentUserDefault()
     )
-    #title = serializers.SlugRelatedField(
-    #     slug_field='name',
-    #     read_only=True,
-    #     allow_null=True
-    # )
 
     class Meta:
         model = Review
-        fields = ('id', 'text', 'author', 'score', 'pub_date', )#'title')
-
-        #validators = [
-        #     UniqueTogetherValidator(
-        #         queryset=Review.objects.all(),
-        #         fields=('author', 'title')
-        #     )
-        # ]
+        fields = ('id', 'text', 'author', 'score', 'pub_date', )
 
     def validate(self, data):
         score_value = [value for value in range(1, 11)]
@@ -174,6 +162,9 @@ class ReviewSerializer(serializers.ModelSerializer):
             )
         if not data.get('score'):
             raise serializers.ValidationError('Задайте значение "score".')
+        # if Review.objects.filter(author=self.author, title=self.title).exists():
+        #     raise serializers.ValidationError('Вы уже делали обзор на данное произведение')
+        
         return data
 
 
