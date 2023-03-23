@@ -20,81 +20,47 @@ class Command(BaseCommand):
                 print(ERROR_MESSAGE)
                 return
 
+        self.load_data_from_csv(
+            'users.csv', User, id='id', username='username', email='email',
+            role='role', bio='bio'
+        )
+        self.load_data_from_csv(
+            'category.csv', Category, id='id', name='name', slug='slug'
+        )
+        self.load_data_from_csv(
+            'genre.csv', Genre, id='id', name='name', slug='slug'
+        )
+        self.load_data_from_csv(
+            'titles.csv', Title, id='id', name='name', year='year',
+            category_id='category'
+        )
+        self.load_data_from_csv(
+            'genre_title.csv', GenreTitle, id='id', title_id='title_id',
+            genre_id='genre_id'
+        )
+        self.load_data_from_csv(
+            'review.csv', Review, id='id', title_id='title_id', text='text',
+            author_id='author', score='score', pub_date='pub_date'
+        )
+        self.load_data_from_csv(
+            'comments.csv', Comment, id='id', review_id='review_id',
+            text='text', author_id='author', pub_date='pub_date'
+        )
+
+        print('Данные загружены')
+
+    def load_data_from_csv(self, filename, model_class, **field_names):
         try:
-            for row in csv.DictReader(
-                open('./static/data/users.csv', encoding='utf-8')
-            ):
-                new_table = User(
-                    id=row['id'],
-                    username=row['username'],
-                    email=row['email'],
-                    role=row['role'],
-                    bio=row['bio'],
-                )
-                new_table .save()
-            for row in csv.DictReader(
-                open('./static/data/category.csv', encoding='utf-8')
-            ):
-                new_table = Category(
-                    id=row['id'],
-                    name=row['name'],
-                    slug=row['slug'],
-                )
-                new_table .save()
-            for row in csv.DictReader(
-                open('./static/data/genre.csv', encoding='utf-8')
-            ):
-                new_table = Genre(
-                    id=row['id'],
-                    name=row['name'],
-                    slug=row['slug'],
-                )
-                new_table .save()
-            for row in csv.DictReader(
-                open('./static/data/titles.csv', encoding='utf-8')
-            ):
-                new_table = Title(
-                    id=row['id'],
-                    name=row['name'],
-                    year=row['year'],
-                    category=Category.objects.get(pk=row['category']),
-                )
-                new_table .save()
-            for row in csv.DictReader(
-                open('./static/data/genre_title.csv', encoding='utf-8')
-            ):
-                new_table = GenreTitle(
-                    id=row['id'],
-                    title=Title.objects.get(pk=row['title_id']),
-                    genre=Genre.objects.get(pk=row['genre_id']),
-                )
-                new_table .save()
-            for row in csv.DictReader(
-                open('./static/data/review.csv', encoding='utf-8')
-            ):
-                new_table = Review(
-                    id=row['id'],
-                    title=Title.objects.get(pk=row['title_id']),
-                    text=row['text'],
-                    author=User.objects.get(pk=row['author']),
-                    score=row['score'],
-                    pub_date=row['pub_date'],
-                )
-                new_table .save()
-            for row in csv.DictReader(
-                open('./static/data/comments.csv', encoding='utf-8')
-            ):
-                new_table = Comment(
-                    id=row['id'],
-                    review=Review.objects.get(pk=row['review_id']),
-                    text=row['text'],
-                    author=User.objects.get(pk=row['author']),
-                    pub_date=row['pub_date'],
-                )
-                new_table .save()
+            with open(
+                f'./static/data/{filename}', encoding='utf-8'
+            ) as csv_file:
+                for row in csv.DictReader(csv_file):
+                    kwargs = {}
+                    for field_name, csv_column_name in field_names.items():
+                        kwargs[field_name] = row[csv_column_name]
+                    model_instance = model_class(**kwargs)
+                    model_instance.save()
         except ValueError:
             print('Значение неопределенно')
         except Exception:
             print('Возникла непредвиденная ситуация')
-        else:
-            print('Данные загружены')
