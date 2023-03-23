@@ -39,6 +39,7 @@ class TitleViewSet(viewsets.ModelViewSet):
             return TitleSerializer
         return TitleCCDSerializer
 
+
 class CategoryViewSet(
     mixins.CreateModelMixin,
     mixins.ListModelMixin,

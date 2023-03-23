@@ -62,11 +62,13 @@ class Title(models.Model):
         Genre,
         verbose_name='Жанр',
         help_text='Выберите жанр',
+        through='GenreTitle'
     )
     description = models.TextField(
         verbose_name='Описание произведения',
         help_text='О чем данное произведение?',
         blank=True,
+        null=True,
     )
     rating = models.PositiveSmallIntegerField(
         null=True,
@@ -154,3 +156,20 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.text[:50]
+
+
+class GenreTitle(models.Model):
+    genre = models.ForeignKey(
+        Genre,
+        null=True,
+        on_delete=models.CASCADE,
+        verbose_name='Жанр'
+    )
+    title = models.ForeignKey(
+        Title,
+        on_delete=models.CASCADE,
+        verbose_name='Произведение'
+    )
+
+    def __str__(self):
+        return f'{self.title}, жанр: {self.genre}'

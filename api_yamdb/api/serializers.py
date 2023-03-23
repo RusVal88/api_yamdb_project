@@ -2,10 +2,10 @@ from django.contrib.auth import get_user_model
 
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
-from rest_framework.validators import UniqueValidator
+from rest_framework.validators import UniqueValidator, UniqueTogetherValidator
 
-from reviews.models import Category, Genre, Title, Review, Comment
-from api.validators import validate_username
+from users.validators import validate_username
+from review.models import Category, Genre, Titles, Review, Comment
 
 User = get_user_model()
 
@@ -14,7 +14,7 @@ class SignUpSerializer(serializers.ModelSerializer):
     username = serializers.CharField(
         required=True,
         max_length=150,
-        validators=[validate_username, ]
+        validators=[validate_username,]
     )
     email = serializers.EmailField(
         required=True,
@@ -43,7 +43,7 @@ class TokenSerializer(serializers.Serializer):
     username = serializers.CharField(
         required=True,
         max_length=150,
-        validators=[validate_username, ]
+        validators=[validate_username,]
     )
     confirmation_code = serializers.CharField(
         required=True,
@@ -113,31 +113,7 @@ class GenreSerializer(serializers.ModelSerializer):
         model = Genre
 
 
-class TitleCCDSerializer(serializers.ModelSerializer):
-    """create, change, destroy"""
-    category = serializers.SlugRelatedField(
-        queryset=Category.objects.all(),
-        slug_field='slug',
-    )
-    genre = serializers.SlugRelatedField(
-        many=True,
-        queryset=Genre.objects.all(),
-        slug_field='slug',
-    )
-
-    class Meta:
-        model = Title
-        fields = ('id',
-                  'name',
-                  'year',
-                  'rating',
-                  'description',
-                  'genre',
-                  'category',)
-
-
-class TitleSerializer(serializers.ModelSerializer):
-    """list, retrieve"""
+class TitlesSerializer(serializers.ModelSerializer):
     rating = serializers.SerializerMethodField()
     category = CategorySerializer(read_only=True)
     genre = GenreSerializer(
@@ -146,7 +122,7 @@ class TitleSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        model = Title
+        model = Titles
         fields = ('id',
                   'name',
                   'year',
@@ -167,28 +143,27 @@ class TitleSerializer(serializers.ModelSerializer):
 
 
 class ReviewSerializer(serializers.ModelSerializer):
-    author = serializers.SlugRelatedField(
-        slug_field='username',
-        read_only=True,
-        default=serializers.CurrentUserDefault()
-    )
+    author = SlugRelatedField(slug_field='username', read_only=True)
 
     class Meta:
         model = Review
-        fields = ('id', 'text', 'author', 'score', 'pub_date', )
+        fields = ('id', 'text', 'author', 'score', 'pub_date')
+
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Review.objects.all(),
+                fields=('author', 'title')
+            )
+        ]
 
     def validate(self, data):
-        score_value = [value for value in range(1, 11)]
-        if data.get('score') not in score_value:
+        if data.get('score') not in data.get('score_value'):
             raise serializers.ValidationError(
                 'Переданное значение "score" недопустимо.'
                 'Укажите число от 1 до 10.'
             )
         if not data.get('score'):
             raise serializers.ValidationError('Задайте значение "score".')
-        #if Review.objects.filter(author=self.author, title=self.title).exists():
-        #     raise serializers.ValidationError('Вы уже делали обзор на данное произведение')
-        
         return data
 
 
