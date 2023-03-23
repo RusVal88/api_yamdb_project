@@ -14,7 +14,7 @@ class SignUpSerializer(serializers.ModelSerializer):
     username = serializers.CharField(
         required=True,
         max_length=150,
-        validators=[validate_username,]
+        validators=[validate_username, ]
     )
     email = serializers.EmailField(
         required=True,
@@ -43,7 +43,7 @@ class TokenSerializer(serializers.Serializer):
     username = serializers.CharField(
         required=True,
         max_length=150,
-        validators=[validate_username,]
+        validators=[validate_username, ]
     )
     confirmation_code = serializers.CharField(
         required=True,
@@ -113,7 +113,31 @@ class GenreSerializer(serializers.ModelSerializer):
         model = Genre
 
 
+class TitlesCCDSerializer(serializers.ModelSerializer):
+    """create, change, destroy"""
+    category = serializers.SlugRelatedField(
+        queryset=Category.objects.all(),
+        slug_field='slug',
+    )
+    genre = serializers.SlugRelatedField(
+        many=True,
+        queryset=Genre.objects.all(),
+        slug_field='slug',
+    )
+
+    class Meta:
+        model = Titles
+        fields = ('id',
+                  'name',
+                  'year',
+                  'rating',
+                  'description',
+                  'genre',
+                  'category',)
+
+
 class TitlesSerializer(serializers.ModelSerializer):
+    """list, retrieve"""
     rating = serializers.SerializerMethodField()
     category = CategorySerializer(read_only=True)
     genre = GenreSerializer(

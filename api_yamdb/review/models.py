@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 
+from users.validators import validate_year
+
 User = get_user_model()
 
 
@@ -70,6 +72,7 @@ class Titles(models.Model):
     year = models.IntegerField(
         verbose_name='Год создания',
         help_text='Укажите год создания произведения',
+        validators=[validate_year],
     )
     name = models.CharField(
         max_length=256,

@@ -5,12 +5,13 @@ from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from django.core.mail import send_mail
 
-from rest_framework import viewsets, filters, permissions
+from rest_framework import viewsets, filters, permissions, mixins
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.decorators import (api_view, permission_classes,
                                        action)
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
+from django_filters.rest_framework import DjangoFilterBackend
 
 from api.permissions import (AuthorOrReadOnlyPermission,
                              IsAdminOrSuperUser, AdminOrReadOnlyPermission)
@@ -18,29 +19,52 @@ from api.serializers import (CommentSerializer, ReviewSerializer,
                              TitlesSerializer, UserSerializer,
                              SignUpSerializer, ProfileSerializer,
                              TokenSerializer, CategorySerializer,
-                             GenreSerializer,)
+                             GenreSerializer, TitlesCCDSerializer)
 from review.models import Review, Titles, Category, Genre
 from api_yamdb.settings import DEFAULT_FROM_EMAIL
+from .filters import TitlesFilter
 
 User = get_user_model()
 
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Titles.objects.all()
-    serializer_class = TitlesSerializer
     permission_classes = (AdminOrReadOnlyPermission, )
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = TitlesFilter
+
+    def get_serializer_class(self):
+        if self.action in ('list', 'retrieve'):
+            return TitlesSerializer
+        return TitlesCCDSerializer
 
 
-class CategoryViewSet(viewsets.ModelViewSet):
+class CategoryViewSet(
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    mixins.DestroyModelMixin,
+    viewsets.GenericViewSet,
+):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = (AdminOrReadOnlyPermission, )
+    filter_backends = (filters.SearchFilter, )
+    search_fields = ('name', )
+    lookup_field = 'slug'
 
 
-class GenreViewSet(viewsets.ModelViewSet):
+class GenreViewSet(
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    mixins.DestroyModelMixin,
+    viewsets.GenericViewSet,
+):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permission_classes = (AdminOrReadOnlyPermission, )
+    filter_backends = (filters.SearchFilter, )
+    search_fields = ('name', )
+    lookup_field = 'slug'
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
@@ -61,7 +85,6 @@ class ReviewViewSet(viewsets.ModelViewSet):
 class CommentsViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
     permission_classes = (AuthorOrReadOnlyPermission, )
-
 
     def get_queryset(self):
         title = get_object_or_404(Titles, id=self.kwargs.get('title_id'))
