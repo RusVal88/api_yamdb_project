@@ -1,79 +1,107 @@
 from http import HTTPStatus
 
-from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth import get_user_model
-from django.shortcuts import get_object_or_404
+from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
-
-from rest_framework import viewsets, filters, permissions
-from rest_framework.pagination import LimitOffsetPagination
-from rest_framework.decorators import (api_view, permission_classes,
-                                       action)
+from django.db import IntegrityError
+from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters, mixins, permissions, serializers, viewsets
+from rest_framework.decorators import action, api_view, permission_classes
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 
-from api.permissions import (AuthorOrReadOnlyPermission,
-                             IsAdminOrSuperUser, AdminOrReadOnlyPermission)
-from api.serializers import (CommentSerializer, ReviewSerializer,
-                             TitlesSerializer, UserSerializer,
-                             SignUpSerializer, ProfileSerializer,
-                             TokenSerializer, CategorySerializer,
-                             GenreSerializer,)
-from review.models import Review, Titles, Category, Genre
+from api.filters import TitlesFilter
+from api.permissions import (AdminOrReadOnlyPermission,
+                             AuthorAndStaffOrReadOnlyPermission,
+                             IsAdminOrSuperUser)
+from api.serializers import (CategorySerializer, CommentSerializer,
+                             GenreSerializer, ProfileSerializer,
+                             ReviewSerializer, SignUpSerializer,
+                             TitleCCDSerializer, TitleSerializer,
+                             TokenSerializer, UserSerializer)
 from api_yamdb.settings import DEFAULT_FROM_EMAIL
+from reviews.models import Category, Genre, Review, Title
+
 
 User = get_user_model()
 
 
-class TitleViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Titles.objects.all()
-    serializer_class = TitlesSerializer
+class TitleViewSet(viewsets.ModelViewSet):
+    queryset = Title.objects.all()
     permission_classes = (AdminOrReadOnlyPermission, )
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = TitlesFilter
+
+    def get_serializer_class(self):
+        if self.action in ('list', 'retrieve'):
+            return TitleSerializer
+        return TitleCCDSerializer
 
 
-class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
+class CategoryViewSet(
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    mixins.DestroyModelMixin,
+    viewsets.GenericViewSet,
+):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = (AdminOrReadOnlyPermission, )
+    filter_backends = (filters.SearchFilter, )
+    search_fields = ('name', )
+    lookup_field = 'slug'
 
 
-class GenreViewSet(viewsets.ReadOnlyModelViewSet):
+class GenreViewSet(
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    mixins.DestroyModelMixin,
+    viewsets.GenericViewSet,
+):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permission_classes = (AdminOrReadOnlyPermission, )
+    filter_backends = (filters.SearchFilter, )
+    search_fields = ('name', )
+    lookup_field = 'slug'
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    permission_classes = (AuthorOrReadOnlyPermission,)
-    pagination_class = LimitOffsetPagination
+    permission_classes = (AuthorAndStaffOrReadOnlyPermission,
+                          IsAuthenticatedOrReadOnly)
 
     def get_queryset(self):
-        title = get_object_or_404(Titles, id=self.kwargs.get('title_id'))
+        title = get_object_or_404(Title, id=self.kwargs.get('title_id'))
         return title.review.all()
 
     def perform_create(self, serializer):
-        serializer.save(
-            author=self.request.user,
-            title=get_object_or_404(Titles, id=self.kwargs.get('title_id'))
-        )
+        try:
+            serializer.save(
+                author=self.request.user,
+                title=get_object_or_404(Title, id=self.kwargs.get('title_id'))
+            )
+        except IntegrityError:
+            raise serializers.ValidationError('Вы уже оставляли отзыв на'
+                                              'этот фильм')
 
 
 class CommentsViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
-    permission_classes = (AuthorOrReadOnlyPermission, )
-    pagination_class = LimitOffsetPagination
+    permission_classes = (AuthorAndStaffOrReadOnlyPermission,
+                          IsAuthenticatedOrReadOnly)
 
     def get_queryset(self):
-        title = get_object_or_404(Titles, id=self.kwargs.get('title_id'))
+        title = get_object_or_404(Title, id=self.kwargs.get('title_id'))
         review = get_object_or_404(Review, id=self.kwargs.get('review_id'))
-        return review.comments.filter(review=review, review__titles=title)
+        return review.comments.filter(review=review, review__title=title)
 
     def perform_create(self, serializer):
         serializer.save(
             author=self.request.user,
             review=get_object_or_404(Review, id=self.kwargs.get('review_id')),
-            title=get_object_or_404(Titles, id=self.kwargs.get('title_id'))
         )
 
 
@@ -125,7 +153,6 @@ class UserViewSet(viewsets.ModelViewSet):
     lookup_field = 'username'
     filter_backends = (filters.SearchFilter,)
     search_fields = ('=username',)
-    pagination_class = LimitOffsetPagination
     http_method_names = ['get', 'post', 'patch', 'delete']
 
     @action(

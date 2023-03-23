@@ -1,5 +1,7 @@
-from django.db import models
 from django.contrib.auth import get_user_model
+from django.db import models
+
+from api.validators import validate_year
 
 User = get_user_model()
 
@@ -44,7 +46,7 @@ class Genre(models.Model):
         return self.name
 
 
-class Titles(models.Model):
+class Title(models.Model):
     category = models.ForeignKey(
         Category,
         verbose_name='Категория',
@@ -56,11 +58,13 @@ class Titles(models.Model):
         Genre,
         verbose_name='Жанр',
         help_text='Выберите жанр',
+        through='GenreTitle'
     )
     description = models.TextField(
         verbose_name='Описание произведения',
         help_text='О чем данное произведение?',
         blank=True,
+        null=True,
     )
     rating = models.PositiveSmallIntegerField(
         null=True,
@@ -70,6 +74,7 @@ class Titles(models.Model):
     year = models.IntegerField(
         verbose_name='Год создания',
         help_text='Укажите год создания произведения',
+        validators=[validate_year],
     )
     name = models.CharField(
         max_length=256,
@@ -107,8 +112,8 @@ class Review(models.Model):
         help_text='Выберите оценку от 1 до 10',
         choices=score_value,
     )
-    titles = models.ForeignKey(
-        Titles,
+    title = models.ForeignKey(
+        Title,
         verbose_name='Произведение',
         on_delete=models.CASCADE,
         related_name='review',
@@ -118,12 +123,7 @@ class Review(models.Model):
         return self.text[:300]
 
     class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=['author', 'titles', ],
-                name='unique_author_titles'
-            )
-        ]
+        unique_together = ('author', 'title')
 
 
 class Comment(models.Model):
@@ -150,3 +150,20 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.text[:50]
+
+
+class GenreTitle(models.Model):
+    genre = models.ForeignKey(
+        Genre,
+        null=True,
+        on_delete=models.CASCADE,
+        verbose_name='Жанр'
+    )
+    title = models.ForeignKey(
+        Title,
+        on_delete=models.CASCADE,
+        verbose_name='Произведение'
+    )
+
+    def __str__(self):
+        return f'{self.title}, жанр: {self.genre}'

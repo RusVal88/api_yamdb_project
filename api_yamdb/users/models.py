@@ -1,7 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-from users.validators import validate_username
+from api.validators import validate_username
 
 
 class User(AbstractUser):
@@ -17,7 +17,7 @@ class User(AbstractUser):
         unique=True,
         blank=False,
         null=False,
-        validators=[validate_username,]
+        validators=[validate_username, ]
     )
     first_name = models.CharField(
         verbose_name='Имя пользователя',
