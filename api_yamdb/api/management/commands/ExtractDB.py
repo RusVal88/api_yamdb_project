@@ -24,7 +24,7 @@ class Command(BaseCommand):
             for row in csv.DictReader(
                 open('./static/data/users.csv', encoding='utf-8')
             ):
-                new_table  = User(
+                new_table = User(
                     id=row['id'],
                     username=row['username'],
                     email=row['email'],
@@ -35,7 +35,7 @@ class Command(BaseCommand):
             for row in csv.DictReader(
                 open('./static/data/category.csv', encoding='utf-8')
             ):
-                new_table  = Category(
+                new_table = Category(
                     id=row['id'],
                     name=row['name'],
                     slug=row['slug'],
@@ -44,7 +44,7 @@ class Command(BaseCommand):
             for row in csv.DictReader(
                 open('./static/data/genre.csv', encoding='utf-8')
             ):
-                new_table  = Genre(
+                new_table = Genre(
                     id=row['id'],
                     name=row['name'],
                     slug=row['slug'],
@@ -53,7 +53,7 @@ class Command(BaseCommand):
             for row in csv.DictReader(
                 open('./static/data/titles.csv', encoding='utf-8')
             ):
-                new_table  = Title(
+                new_table = Title(
                     id=row['id'],
                     name=row['name'],
                     year=row['year'],
@@ -63,7 +63,7 @@ class Command(BaseCommand):
             for row in csv.DictReader(
                 open('./static/data/genre_title.csv', encoding='utf-8')
             ):
-                new_table  = GenreTitle(
+                new_table = GenreTitle(
                     id=row['id'],
                     title=Title.objects.get(pk=row['title_id']),
                     genre=Genre.objects.get(pk=row['genre_id']),
@@ -72,7 +72,7 @@ class Command(BaseCommand):
             for row in csv.DictReader(
                 open('./static/data/review.csv', encoding='utf-8')
             ):
-                new_table  = Review(
+                new_table = Review(
                     id=row['id'],
                     title=Title.objects.get(pk=row['title_id']),
                     text=row['text'],
@@ -84,7 +84,7 @@ class Command(BaseCommand):
             for row in csv.DictReader(
                 open('./static/data/comments.csv', encoding='utf-8')
             ):
-                new_table  = Comment(
+                new_table = Comment(
                     id=row['id'],
                     review=Review.objects.get(pk=row['review_id']),
                     text=row['text'],
