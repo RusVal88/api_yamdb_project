@@ -1,9 +1,5 @@
-from django.db import models
 from django.contrib.auth import get_user_model
-from rest_framework.exceptions import ValidationError
-
-from rest_framework import serializers
-
+from django.db import models
 
 from api.validators import validate_year
 
@@ -124,10 +120,8 @@ class Review(models.Model):
     def __str__(self):
         return self.text[:300]
 
-    def save(self, *args, **kwargs):
-        if Review.objects.filter(author=self.author, title=self.title).exists():
-            raise ValidationError('Вы уже делали обзор на данное произведение')
-        super().save(*args, **kwargs)
+    class Meta:
+        unique_together = ('author', 'title')
 
 
 class Comment(models.Model):

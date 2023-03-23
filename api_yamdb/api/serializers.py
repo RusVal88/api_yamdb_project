@@ -4,8 +4,8 @@ from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 from rest_framework.validators import UniqueValidator
 
-from reviews.models import Category, Genre, Title, Review, Comment
 from api.validators import validate_username
+from reviews.models import Category, Comment, Genre, Review, Title
 
 User = get_user_model()
 
@@ -186,9 +186,6 @@ class ReviewSerializer(serializers.ModelSerializer):
             )
         if not data.get('score'):
             raise serializers.ValidationError('Задайте значение "score".')
-        #if Review.objects.filter(author=self.author, title=self.title).exists():
-        #     raise serializers.ValidationError('Вы уже делали обзор на данное произведение')
-        
         return data
 
 
