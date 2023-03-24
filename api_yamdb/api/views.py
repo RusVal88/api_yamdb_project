@@ -103,10 +103,14 @@ def sign_up(request):
     serializer.is_valid(raise_exception=True)
     username = serializer.data.get('username')
     email = serializer.data.get('email')
-    user, created = User.objects.get_or_create(
-        username=username,
-        email=email
-    )
+    try:
+        user, created = User.objects.get_or_create(
+            username=username,
+            email=email
+        )
+    except IntegrityError:
+        message = ('Пользователь с такими данными уже существует!')
+        raise serializers.ValidationError(message)
     confirmation_code = default_token_generator.make_token(user)
     message = (
         f'{username}, ваш код подтверждения: {confirmation_code}'
