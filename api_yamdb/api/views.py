@@ -23,6 +23,7 @@ from api.serializers import (CategorySerializer, CommentSerializer,
                              TokenSerializer, UserSerializer)
 from api_yamdb.settings import DEFAULT_FROM_EMAIL
 from reviews.models import Category, Genre, Review, Title
+from api.mixins import CategoryGenre
 
 
 User = get_user_model()
@@ -40,12 +41,7 @@ class TitleViewSet(viewsets.ModelViewSet):
         return TitleCCDSerializer
 
 
-class CategoryViewSet(
-    mixins.CreateModelMixin,
-    mixins.ListModelMixin,
-    mixins.DestroyModelMixin,
-    viewsets.GenericViewSet,
-):
+class CategoryViewSet(CategoryGenre):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = (AdminOrReadOnlyPermission, )
@@ -54,12 +50,7 @@ class CategoryViewSet(
     lookup_field = 'slug'
 
 
-class GenreViewSet(
-    mixins.CreateModelMixin,
-    mixins.ListModelMixin,
-    mixins.DestroyModelMixin,
-    viewsets.GenericViewSet,
-):
+class GenreViewSet(CategoryGenre):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permission_classes = (AdminOrReadOnlyPermission, )

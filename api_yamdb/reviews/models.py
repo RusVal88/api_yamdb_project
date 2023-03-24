@@ -16,8 +16,8 @@ class Category(models.Model):
         max_length=50,
         verbose_name='Страница категории',
         help_text=(
-            'Введите адрес страницы категории,'
-            'доступные символы: ^[-a-zA-Z0-9_]+$'
+            'Введите адрес категории'
+
         ),
         unique=True,
     )
@@ -37,7 +37,6 @@ class Genre(models.Model):
         verbose_name='Страница жанра',
         help_text=(
             'Введите адрес страницы жанра,'
-            'доступные символы: ^[-a-zA-Z0-9_]+$'
         ),
         unique=True,
     )
@@ -75,6 +74,7 @@ class Title(models.Model):
         verbose_name='Год создания',
         help_text='Укажите год создания произведения',
         validators=[validate_year],
+        db_index=True,
     )
     name = models.CharField(
         max_length=256,
