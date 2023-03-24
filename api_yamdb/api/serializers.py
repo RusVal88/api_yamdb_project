@@ -177,17 +177,6 @@ class ReviewSerializer(serializers.ModelSerializer):
         model = Review
         fields = ('id', 'text', 'author', 'score', 'pub_date', )
 
-    def validate(self, data):
-        score_value = [value for value in range(1, 11)]
-        if data.get('score') not in score_value:
-            raise serializers.ValidationError(
-                'Переданное значение "score" недопустимо.'
-                'Укажите число от 1 до 10.'
-            )
-        if not data.get('score'):
-            raise serializers.ValidationError('Задайте значение "score".')
-        return data
-
 
 class CommentSerializer(serializers.ModelSerializer):
     author = SlugRelatedField(slug_field='username', read_only=True)
