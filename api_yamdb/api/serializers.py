@@ -1,5 +1,5 @@
 from django.contrib.auth import get_user_model
-
+from django.db import IntegrityError
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 from rest_framework.validators import UniqueValidator
@@ -10,7 +10,7 @@ from reviews.models import Category, Comment, Genre, Review, Title
 User = get_user_model()
 
 
-class SignUpSerializer(serializers.ModelSerializer):
+class SignUpSerializer(serializers.Serializer):
     username = serializers.CharField(
         required=True,
         max_length=150,
@@ -20,23 +20,6 @@ class SignUpSerializer(serializers.ModelSerializer):
         required=True,
         max_length=254,
     )
-
-    def validate(self, data):
-        if User.objects.filter(username=data['username'],
-                               email=data['email']).exists():
-            return data
-        if (User.objects.filter(
-            username=data['username']).exists()
-            or User.objects.filter(
-                email=data['email']).exists()):
-            raise serializers.ValidationError(
-                'Данный пользователь уже существует!'
-            )
-        return data
-
-    class Meta:
-        model = User
-        fields = ('username', 'email',)
 
 
 class TokenSerializer(serializers.Serializer):
@@ -173,20 +156,16 @@ class ReviewSerializer(serializers.ModelSerializer):
         default=serializers.CurrentUserDefault()
     )
 
+    def create(self, validated_data):
+        try:
+            return super().create(validated_data)
+        except IntegrityError:
+            raise serializers.ValidationError('Вы уже оставляли отзыв на'
+                                              'этот фильм')
+
     class Meta:
         model = Review
         fields = ('id', 'text', 'author', 'score', 'pub_date', )
-
-    def validate(self, data):
-        score_value = [value for value in range(1, 11)]
-        if data.get('score') not in score_value:
-            raise serializers.ValidationError(
-                'Переданное значение "score" недопустимо.'
-                'Укажите число от 1 до 10.'
-            )
-        if not data.get('score'):
-            raise serializers.ValidationError('Задайте значение "score".')
-        return data
 
 
 class CommentSerializer(serializers.ModelSerializer):

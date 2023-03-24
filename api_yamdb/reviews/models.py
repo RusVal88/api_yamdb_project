@@ -1,7 +1,7 @@
-from django.contrib.auth import get_user_model
-from django.db import models
-
 from api.validators import validate_year
+from django.contrib.auth import get_user_model
+from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import models
 
 User = get_user_model()
 
@@ -16,8 +16,8 @@ class Category(models.Model):
         max_length=50,
         verbose_name='Страница категории',
         help_text=(
-            'Введите адрес страницы категории,'
-            'доступные символы: ^[-a-zA-Z0-9_]+$'
+            'Введите адрес категории'
+
         ),
         unique=True,
     )
@@ -37,7 +37,6 @@ class Genre(models.Model):
         verbose_name='Страница жанра',
         help_text=(
             'Введите адрес страницы жанра,'
-            'доступные символы: ^[-a-zA-Z0-9_]+$'
         ),
         unique=True,
     )
@@ -75,6 +74,7 @@ class Title(models.Model):
         verbose_name='Год создания',
         help_text='Укажите год создания произведения',
         validators=[validate_year],
+        db_index=True,
     )
     name = models.CharField(
         max_length=256,
@@ -107,10 +107,11 @@ class Review(models.Model):
         on_delete=models.CASCADE,
         related_name='review',
     )
-    score = models.IntegerField(
+    score = models.PositiveSmallIntegerField(
         verbose_name='Оценка',
         help_text='Выберите оценку от 1 до 10',
         choices=score_value,
+        validators=[MinValueValidator(1), MaxValueValidator(10)]
     )
     title = models.ForeignKey(
         Title,
@@ -119,11 +120,14 @@ class Review(models.Model):
         related_name='review',
     )
 
-    def __str__(self):
-        return self.text[:300]
-
     class Meta:
         unique_together = ('author', 'title')
+
+    def __str__(self):
+        return (
+            f'Обзор: "{self.heading}" от {self.author} c оценкой '
+            '{self.score}.'
+        )
 
 
 class Comment(models.Model):

@@ -6,12 +6,13 @@ from django.core.mail import send_mail
 from django.db import IntegrityError
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, mixins, permissions, serializers, viewsets
+from rest_framework import filters, permissions, viewsets, serializers
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 
+from api.mixins import CategoryGenreMixin
 from api.filters import TitlesFilter
 from api.permissions import (AdminOrReadOnlyPermission,
                              AuthorAndStaffOrReadOnlyPermission,
@@ -40,12 +41,7 @@ class TitleViewSet(viewsets.ModelViewSet):
         return TitleCCDSerializer
 
 
-class CategoryViewSet(
-    mixins.CreateModelMixin,
-    mixins.ListModelMixin,
-    mixins.DestroyModelMixin,
-    viewsets.GenericViewSet,
-):
+class CategoryViewSet(CategoryGenreMixin):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = (AdminOrReadOnlyPermission, )
@@ -54,12 +50,7 @@ class CategoryViewSet(
     lookup_field = 'slug'
 
 
-class GenreViewSet(
-    mixins.CreateModelMixin,
-    mixins.ListModelMixin,
-    mixins.DestroyModelMixin,
-    viewsets.GenericViewSet,
-):
+class GenreViewSet(CategoryGenreMixin):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permission_classes = (AdminOrReadOnlyPermission, )
@@ -78,14 +69,10 @@ class ReviewViewSet(viewsets.ModelViewSet):
         return title.review.all()
 
     def perform_create(self, serializer):
-        try:
-            serializer.save(
-                author=self.request.user,
-                title=get_object_or_404(Title, id=self.kwargs.get('title_id'))
-            )
-        except IntegrityError:
-            raise serializers.ValidationError('Вы уже оставляли отзыв на'
-                                              'этот фильм')
+        serializer.save(
+            author=self.request.user,
+            title=get_object_or_404(Title, id=self.kwargs.get('title_id'))
+        )
 
 
 class CommentsViewSet(viewsets.ModelViewSet):
@@ -112,10 +99,14 @@ def sign_up(request):
     serializer.is_valid(raise_exception=True)
     username = serializer.data.get('username')
     email = serializer.data.get('email')
-    user, created = User.objects.get_or_create(
-        username=username,
-        email=email
-    )
+    try:
+        user, created = User.objects.get_or_create(
+            username=username,
+            email=email
+        )
+    except IntegrityError:
+        message = ('Пользователь с такими данными уже существует!')
+        raise serializers.ValidationError(message)
     confirmation_code = default_token_generator.make_token(user)
     message = (
         f'{username}, ваш код подтверждения: {confirmation_code}'
