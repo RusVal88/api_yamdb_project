@@ -11,7 +11,7 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 
-from api.mixins import CategoryGenre
+from api.mixins import CategoryGenreMixin
 from api.filters import TitlesFilter
 from api.permissions import (AdminOrReadOnlyPermission,
                              AuthorAndStaffOrReadOnlyPermission,
@@ -40,7 +40,7 @@ class TitleViewSet(viewsets.ModelViewSet):
         return TitleCCDSerializer
 
 
-class CategoryViewSet(CategoryGenre):
+class CategoryViewSet(CategoryGenreMixin):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = (AdminOrReadOnlyPermission, )
@@ -49,7 +49,7 @@ class CategoryViewSet(CategoryGenre):
     lookup_field = 'slug'
 
 
-class GenreViewSet(CategoryGenre):
+class GenreViewSet(CategoryGenreMixin):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permission_classes = (AdminOrReadOnlyPermission, )
