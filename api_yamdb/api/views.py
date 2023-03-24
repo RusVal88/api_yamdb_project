@@ -3,15 +3,15 @@ from http import HTTPStatus
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
-from django.db import IntegrityError
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, permissions, serializers, viewsets
+from rest_framework import filters, permissions, viewsets
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 
+from api.mixins import CategoryGenre
 from api.filters import TitlesFilter
 from api.permissions import (AdminOrReadOnlyPermission,
                              AuthorAndStaffOrReadOnlyPermission,
@@ -23,7 +23,6 @@ from api.serializers import (CategorySerializer, CommentSerializer,
                              TokenSerializer, UserSerializer)
 from api_yamdb.settings import DEFAULT_FROM_EMAIL
 from reviews.models import Category, Genre, Review, Title
-from api.mixins import CategoryGenre
 
 
 User = get_user_model()
@@ -69,14 +68,10 @@ class ReviewViewSet(viewsets.ModelViewSet):
         return title.review.all()
 
     def perform_create(self, serializer):
-        try:
-            serializer.save(
-                author=self.request.user,
-                title=get_object_or_404(Title, id=self.kwargs.get('title_id'))
-            )
-        except IntegrityError:
-            raise serializers.ValidationError('Вы уже оставляли отзыв на'
-                                              'этот фильм')
+        serializer.save(
+            author=self.request.user,
+            title=get_object_or_404(Title, id=self.kwargs.get('title_id'))
+        )
 
 
 class CommentsViewSet(viewsets.ModelViewSet):

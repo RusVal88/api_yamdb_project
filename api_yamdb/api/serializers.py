@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.db import IntegrityError
 
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
@@ -172,6 +173,13 @@ class ReviewSerializer(serializers.ModelSerializer):
         read_only=True,
         default=serializers.CurrentUserDefault()
     )
+
+    def create(self, validated_data):
+        try:
+            return super().create(validated_data)
+        except IntegrityError:
+            raise serializers.ValidationError('Вы уже оставляли отзыв на'
+                                              'этот фильм')
 
     class Meta:
         model = Review
