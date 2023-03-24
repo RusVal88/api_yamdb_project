@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.db import IntegrityError
 
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
@@ -156,20 +157,16 @@ class ReviewSerializer(serializers.ModelSerializer):
         default=serializers.CurrentUserDefault()
     )
 
+    def create(self, validated_data):
+        try:
+            return super().create(validated_data)
+        except IntegrityError:
+            raise serializers.ValidationError('Вы уже оставляли отзыв на'
+                                              'этот фильм')
+
     class Meta:
         model = Review
         fields = ('id', 'text', 'author', 'score', 'pub_date', )
-
-    def validate(self, data):
-        score_value = [value for value in range(1, 11)]
-        if data.get('score') not in score_value:
-            raise serializers.ValidationError(
-                'Переданное значение "score" недопустимо.'
-                'Укажите число от 1 до 10.'
-            )
-        if not data.get('score'):
-            raise serializers.ValidationError('Задайте значение "score".')
-        return data
 
 
 class CommentSerializer(serializers.ModelSerializer):

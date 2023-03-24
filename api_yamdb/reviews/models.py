@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
 from api.validators import validate_year
@@ -107,10 +108,11 @@ class Review(models.Model):
         on_delete=models.CASCADE,
         related_name='review',
     )
-    score = models.IntegerField(
+    score = models.PositiveSmallIntegerField(
         verbose_name='Оценка',
         help_text='Выберите оценку от 1 до 10',
         choices=score_value,
+        validators=[MinValueValidator(1), MaxValueValidator(10)]
     )
     title = models.ForeignKey(
         Title,
@@ -119,11 +121,14 @@ class Review(models.Model):
         related_name='review',
     )
 
-    def __str__(self):
-        return self.text[:300]
-
     class Meta:
         unique_together = ('author', 'title')
+
+    def __str__(self):
+        return (
+            f'Обзор: "{self.heading}" от {self.author} c оценкой '
+            '{self.score}.'
+        )
 
 
 class Comment(models.Model):
